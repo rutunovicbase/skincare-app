@@ -1,0 +1,77 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/Fonts/AlbertSans-Black.ttf",
+      "sha1": "68320bb7708c30d8e13389e8dd50074a7f0bd12d"
+    },
+    {
+      "path": "assets/Fonts/AlbertSans-BlackItalic.ttf",
+      "sha1": "0ac028d26672ad006935d40853683765a54ea0c2"
+    },
+    {
+      "path": "assets/Fonts/AlbertSans-Bold.ttf",
+      "sha1": "ece621387d75911933a7cfcbec60c43de49d33c4"
+    },
+    {
+      "path": "assets/Fonts/AlbertSans-BoldItalic.ttf",
+      "sha1": "e0e0932f0bbe57f564e7bdde36ba80f18020999b"
+    },
+    {
+      "path": "assets/Fonts/AlbertSans-ExtraBold.ttf",
+      "sha1": "d482d82093acc61b7fc52ddf2ad0f351cc3a8f85"
+    },
+    {
+      "path": "assets/Fonts/AlbertSans-ExtraBoldItalic.ttf",
+      "sha1": "b25899976031e3bc8e11a7a4466a2acc9cb4d6fd"
+    },
+    {
+      "path": "assets/Fonts/AlbertSans-ExtraLight.ttf",
+      "sha1": "a775d5e1b55a8bf5dc8b8c69603a74b8df0bc5d6"
+    },
+    {
+      "path": "assets/Fonts/AlbertSans-ExtraLightItalic.ttf",
+      "sha1": "3edffd626d44d76c11fabd6bcbd9f4f26b888a18"
+    },
+    {
+      "path": "assets/Fonts/AlbertSans-Italic.ttf",
+      "sha1": "fcb5af5a9fe5019cfd55ddc7e7181eca20b5f5b8"
+    },
+    {
+      "path": "assets/Fonts/AlbertSans-Light.ttf",
+      "sha1": "f8c282e84002ccad44a7f37e8f74ab9366f390ae"
+    },
+    {
+      "path": "assets/Fonts/AlbertSans-LightItalic.ttf",
+      "sha1": "e39cf946eaba4157f21cc8097eb4ab175971d606"
+    },
+    {
+      "path": "assets/Fonts/AlbertSans-Medium.ttf",
+      "sha1": "7acac148eb03880816f969718e0670b8687bc3bd"
+    },
+    {
+      "path": "assets/Fonts/AlbertSans-MediumItalic.ttf",
+      "sha1": "e0217fc830143707e6e4b03819b729411dd9a7e4"
+    },
+    {
+      "path": "assets/Fonts/AlbertSans-Regular.ttf",
+      "sha1": "bcc72cadb1c27fb8978163413df1168a15097e99"
+    },
+    {
+      "path": "assets/Fonts/AlbertSans-SemiBold.ttf",
+      "sha1": "0cb9540bfa9a3ca5661cc91d552b28ab0b4bb6f3"
+    },
+    {
+      "path": "assets/Fonts/AlbertSans-SemiBoldItalic.ttf",
+      "sha1": "f8f99ff773662ddb2cf18dc6d089982615716c86"
+    },
+    {
+      "path": "assets/Fonts/AlbertSans-Thin.ttf",
+      "sha1": "11d51f0fe360ade3b2bcee6088917ed190d741ab"
+    },
+    {
+      "path": "assets/Fonts/AlbertSans-ThinItalic.ttf",
+      "sha1": "f4be20da991d7cce52acd204e2e513dc2a44029d"
+    }
+  ]
+}
