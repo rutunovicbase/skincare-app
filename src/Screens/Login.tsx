@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../Constant/Colors';
-import { fontSize, hp, wp } from '../Helpers/globalFunction';
+import { fontSize, hp, navigate, wp } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
 import { icons } from '../Constant/Icons';
 import Animated, {
@@ -97,7 +97,9 @@ function Login(): React.JSX.Element {
         </View>
         <LinearButton
           title={isSignIn ? 'Sign-in' : 'Sign-up'}
-          onPress={() => {}}
+          onPress={() => {
+            navigate('OTPVerification');
+          }}
           style={styles.signInButtonStyle}
           textStyle={styles.signInButtonTextStyle}
         />
@@ -115,9 +117,13 @@ function Login(): React.JSX.Element {
           <Text style={styles.loginWithGoogleText}>Continue with Apple</Text>
         </TouchableOpacity>
         <View style={styles.footerContainer}>
-          <Text style={styles.dontHaveAccountText}>Don’t have an account?</Text>
+          <Text style={styles.dontHaveAccountText}>
+            {isSignIn ? 'Don’t have an account?' : 'Already have an account?'}
+          </Text>
           <TouchableOpacity style={styles.signUpButtonStyle}>
-            <Text style={styles.signUpText}>Sign Up</Text>
+            <Text style={styles.signUpText}>
+              {isSignIn ? 'Sign-up' : 'Sign-in'}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

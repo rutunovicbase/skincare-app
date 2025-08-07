@@ -13,8 +13,8 @@ export const fonts = {
   Medium: 'AlbertSans-Medium',
   MediumItalic: 'AlbertSans-MediumItalic',
   Regular: 'AlbertSans-Regular',
-  Semibold: 'AlbertSans-Semibold',
-  SemiboldItalic: 'AlbertSans-SemiboldItalic',
+  Semibold: 'AlbertSans-SemiBold',
+  SemiboldItalic: 'AlbertSans-SemiBoldItalic',
   Thin: 'AlbertSans-Thin',
   ThinItalic: 'AlbertSans-ThinItalic',
 };

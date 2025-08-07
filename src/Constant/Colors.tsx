@@ -9,4 +9,7 @@ export const colors = {
   borderGray: 'rgba(4, 7, 7, 0.3)',
   dividerColor: '#1A1A1A',
   lightText: 'rgba(4, 7, 7, 0.7)',
+  primaryBorder: 'rgba(201, 239, 101, 0.5)',
+  subheadingText: 'rgba(26, 26, 26, 0.6)',
+  resendText: 'rgba(4, 102, 200, 1)',
 };
