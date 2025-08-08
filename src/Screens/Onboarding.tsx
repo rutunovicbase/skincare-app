@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../Constant/Colors';
-import { fontSize, hp, wp } from '../Helpers/globalFunction';
+import { fontSize, hp, navigate, wp } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
 import { icons } from '../Constant/Icons';
 import OnboardingHeader from '../Components/common/OnboardingHeader';
@@ -61,6 +61,8 @@ export default function Onboarding(): React.JSX.Element {
   const handleNext = () => {
     if (progress.value < ONBOARDING_DATA.length - 1) {
       progress.value = withTiming(progress.value + 1, { duration: 400 });
+    } else {
+      navigate('EnterName');
     }
   };
 
