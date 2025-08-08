@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../Constant/Colors';
-import { fontSize, hp, wp } from '../Helpers/globalFunction';
+import { fontSize, goBack, hp, wp } from '../Helpers/globalFunction';
 import OnboardingHeader from '../Components/common/OnboardingHeader';
 import { fonts } from '../Constant/Fonts';
-import { icons } from '../Constant/Icons';
 import LinearButton from '../Components/common/LinearButton';
 
 const LANGUAGES = [
@@ -23,7 +22,7 @@ function SelectLanguage(): React.JSX.Element {
 
   return (
     <SafeAreaView style={styles.container}>
-      <OnboardingHeader />
+      <OnboardingHeader isIcon />
       <View style={styles.mainContainer}>
         <Text style={styles.selectLanguageText}>
           Select the Language You’re Most Comfortable With
@@ -49,7 +48,7 @@ function SelectLanguage(): React.JSX.Element {
         ))}
         <LinearButton
           title="Continue"
-          onPress={() => {}}
+          onPress={() => goBack()}
           style={styles.continueButton}
           textStyle={styles.continueButtonText}
         />

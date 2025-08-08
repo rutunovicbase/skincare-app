@@ -40,7 +40,12 @@ function Login(): React.JSX.Element {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.languageContainer}>
-        <TouchableOpacity style={styles.languageSelector}>
+        <TouchableOpacity
+          style={styles.languageSelector}
+          onPress={() => {
+            navigate('SelectLanguage');
+          }}
+        >
           <Image source={icons.uk} style={styles.languageIcon} />
           <Text style={styles.languageText}>En</Text>
         </TouchableOpacity>

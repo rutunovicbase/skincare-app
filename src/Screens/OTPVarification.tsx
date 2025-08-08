@@ -12,7 +12,7 @@ import LinearButton from '../Components/common/LinearButton';
 function OTPVerification(): React.JSX.Element {
   return (
     <SafeAreaView style={styles.container}>
-      <OnboardingHeader />
+      <OnboardingHeader isIcon />
       <View style={styles.mainContainer}>
         <Text style={styles.verificationText}>Verification</Text>
         <View style={styles.iconContainer}>
@@ -47,7 +47,7 @@ function OTPVerification(): React.JSX.Element {
             style={styles.confirmButton}
             textStyle={styles.confirmTextStyle}
             onPress={() => {
-              navigate('SelectLanguage');
+              navigate('Onboarding');
             }}
           />
         </View>

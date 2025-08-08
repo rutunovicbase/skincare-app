@@ -5,6 +5,7 @@ import { navigationRef } from '../Helpers/globalFunction';
 import Login from '../Screens/Login';
 import OTPVerification from '../Screens/OTPVarification';
 import SelectLanguage from '../Screens/SelectLanguage';
+import Onboarding from '../Screens/Onboarding';
 
 function RootNavigator(): React.JSX.Element {
   const Stack = createNativeStackNavigator();
@@ -18,6 +19,7 @@ function RootNavigator(): React.JSX.Element {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="OTPVerification" component={OTPVerification} />
         <Stack.Screen name="SelectLanguage" component={SelectLanguage} />
+        <Stack.Screen name="Onboarding" component={Onboarding} />
       </Stack.Navigator>
     </NavigationContainer>
   );
