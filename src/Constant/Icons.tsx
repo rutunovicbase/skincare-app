@@ -9,4 +9,8 @@ export const icons = {
   frame2: require('../../assets/Images/frame2.png'),
   frame3: require('../../assets/Images/frame3.png'),
   info: require('../../assets/Images/info.png'),
+  Male: require('../../assets/Images/Male.png'),
+  Female: require('../../assets/Images/Female.png'),
+  arrow: require('../../assets/Images/Arrow.png'),
+  Other: require('../../assets/Images/Other.png'),
 };

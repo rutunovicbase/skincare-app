@@ -60,7 +60,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    paddingHorizontal: wp(5.33),
   },
   mainContainer: {
     marginTop: hp(4.31),
@@ -165,6 +164,7 @@ const styles = StyleSheet.create({
   },
   confirmButtonContainer: {
     width: '100%',
+    paddingHorizontal: wp(5.33),
   },
 });
 

@@ -7,14 +7,25 @@ import { fonts } from '../../Constant/Fonts';
 function OnboardingHeader({
   isIcon,
   isSkip,
+  isPadding = true,
 }: {
   isIcon?: boolean;
   isSkip?: boolean;
+  isPadding?: boolean;
 }): React.JSX.Element {
   return (
-    <TouchableOpacity style={styles.container} onPress={goBack}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingHorizontal: isPadding ? wp(5.33) : 0,
+        },
+      ]}
+    >
       {isIcon ? (
-        <Image source={icons.back} style={styles.backButtonStyle} />
+        <TouchableOpacity onPress={goBack}>
+          <Image source={icons.back} style={styles.backButtonStyle} />
+        </TouchableOpacity>
       ) : (
         <View />
       )}
@@ -26,7 +37,7 @@ function OnboardingHeader({
       ) : (
         <View />
       )}
-    </TouchableOpacity>
+    </View>
   );
 }
 

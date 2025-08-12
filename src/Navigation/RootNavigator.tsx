@@ -6,8 +6,7 @@ import Login from '../Screens/Login';
 import OTPVerification from '../Screens/OTPVarification';
 import SelectLanguage from '../Screens/SelectLanguage';
 import Onboarding from '../Screens/Onboarding';
-import EnterName from '../Screens/EnterName';
-import SelectGender from '../Screens/SelectGender';
+import OnboardingFlow from '../Screens/OnboardingFlow';
 
 function RootNavigator(): React.JSX.Element {
   const Stack = createNativeStackNavigator();
@@ -22,8 +21,7 @@ function RootNavigator(): React.JSX.Element {
         <Stack.Screen name="OTPVerification" component={OTPVerification} />
         <Stack.Screen name="SelectLanguage" component={SelectLanguage} />
         <Stack.Screen name="Onboarding" component={Onboarding} />
-        <Stack.Screen name="EnterName" component={EnterName} />
-        <Stack.Screen name="SelectGender" component={SelectGender} />
+        <Stack.Screen name="OnboardingFlow" component={OnboardingFlow} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -62,7 +62,7 @@ export default function Onboarding(): React.JSX.Element {
     if (progress.value < ONBOARDING_DATA.length - 1) {
       progress.value = withTiming(progress.value + 1, { duration: 400 });
     } else {
-      navigate('EnterName');
+      navigate('OnboardingFlow');
     }
   };
 
@@ -122,7 +122,7 @@ export default function Onboarding(): React.JSX.Element {
 
   return (
     <SafeAreaView style={styles.container}>
-      <OnboardingHeader isIcon={false} isSkip={true} />
+      <OnboardingHeader isIcon={false} isSkip={true} isPadding={false} />
       <View style={styles.mainContainer}>
         <View style={styles.imageContainer}>
           <Animated.View style={[styles.imageWrapper, amoebaStyle]}>

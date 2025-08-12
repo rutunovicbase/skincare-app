@@ -9,8 +9,8 @@ import LinearButton from '../Components/common/LinearButton';
 
 const LANGUAGES = [
   { label: 'English', code: 'en', icon: 'A' },
-  { label: 'Hindi', code: 'hi', icon: 'अ' },
-  { label: 'Gujarati', code: 'gu', icon: 'અ' },
+  { label: 'हिंदी ', code: 'hi', icon: 'अ' },
+  { label: 'ગુજરાતી', code: 'gu', icon: 'અ' },
 ];
 
 function SelectLanguage(): React.JSX.Element {
@@ -22,7 +22,7 @@ function SelectLanguage(): React.JSX.Element {
 
   return (
     <SafeAreaView style={styles.container}>
-      <OnboardingHeader isIcon />
+      <OnboardingHeader isIcon isPadding={false} />
       <View style={styles.mainContainer}>
         <Text style={styles.selectLanguageText}>
           Select the Language You’re Most Comfortable With
