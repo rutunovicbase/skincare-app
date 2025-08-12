@@ -5,6 +5,7 @@ import { wp, hp, fontSize } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
 import { icons } from '../Constant/Icons';
 import LinearButton from '../Components/common/LinearButton';
+import { genders } from '../Constant/Constant';
 
 type Props = {
   onContinue: () => void;
@@ -13,15 +14,13 @@ type Props = {
 export default function SelectGender({ onContinue }: Props) {
   const [gender, setGender] = useState('');
 
-  const genders = ['Male', 'Female', 'Other'];
-
   return (
     <View style={styles.mainContainer}>
       <View style={styles.content}>
         <Text style={styles.title}>What’s your pronoun?</Text>
 
         <View style={styles.genderContainer}>
-          {genders.map(item => (
+          {genders?.map(item => (
             <View style={styles.genderButtonContainer} key={item}>
               <TouchableOpacity
                 key={item}

@@ -1,5 +1,13 @@
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Image,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TextStyle,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { icons } from '../../Constant/Icons';
 import { fontSize, goBack, hp, wp } from '../../Helpers/globalFunction';
 import { fonts } from '../../Constant/Fonts';
@@ -8,10 +16,14 @@ function OnboardingHeader({
   isIcon,
   isSkip,
   isPadding = true,
+  titleStyle,
+  title,
 }: {
   isIcon?: boolean;
   isSkip?: boolean;
   isPadding?: boolean;
+  title?: string;
+  titleStyle?: StyleProp<TextStyle>;
 }): React.JSX.Element {
   return (
     <View
@@ -29,6 +41,8 @@ function OnboardingHeader({
       ) : (
         <View />
       )}
+
+      {title && <Text style={titleStyle}>{title}</Text>}
 
       {isSkip ? (
         <TouchableOpacity style={styles.skipButtonStyle}>

@@ -13,4 +13,7 @@ export const icons = {
   Female: require('../../assets/Images/Female.png'),
   arrow: require('../../assets/Images/Arrow.png'),
   Other: require('../../assets/Images/Other.png'),
+  user: require('../../assets/Images/user.png'),
+  camera: require('../../assets/Images/camera.png'),
+  gallery: require('../../assets/Images/gallery.png'),
 };

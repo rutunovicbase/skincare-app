@@ -16,30 +16,7 @@ import Animated, {
   useAnimatedReaction,
   runOnJS,
 } from 'react-native-reanimated';
-
-const ONBOARDING_DATA = [
-  {
-    key: '1',
-    title: 'Instant Skin Analysis with AI',
-    description:
-      'Get quick and accurate insights about your skin concerns, powered by advanced AI scanning.',
-    image: icons.frame1,
-  },
-  {
-    key: '2',
-    title: 'One-on-One Consultations',
-    description:
-      'Your skin is unique—our experts are here to help with tailored care that fits your needs.',
-    image: icons.frame2,
-  },
-  {
-    key: '3',
-    title: 'Video Call with a Skin Specialist',
-    description:
-      'Connect instantly with certified dermatologists from the comfort of your home.',
-    image: icons.frame3,
-  },
-];
+import { ONBOARDING_DATA } from '../Constant/Constant';
 
 export default function Onboarding(): React.JSX.Element {
   const [step, setStep] = useState<number>(0);
@@ -59,7 +36,7 @@ export default function Onboarding(): React.JSX.Element {
   );
 
   const handleNext = () => {
-    if (progress.value < ONBOARDING_DATA.length - 1) {
+    if (progress.value < ONBOARDING_DATA?.length - 1) {
       progress.value = withTiming(progress.value + 1, { duration: 400 });
     } else {
       navigate('OnboardingFlow');
@@ -84,7 +61,7 @@ export default function Onboarding(): React.JSX.Element {
     };
   });
 
-  const animatedTextStyles = ONBOARDING_DATA.map((_, index) =>
+  const animatedTextStyles = ONBOARDING_DATA?.map((_, index) =>
     useAnimatedStyle(() => {
       const isActive = Math.round(progress.value) === index;
       return {
@@ -101,7 +78,7 @@ export default function Onboarding(): React.JSX.Element {
 
   const renderDots = () => (
     <View style={styles.paginationContainer}>
-      {ONBOARDING_DATA.map((_, index) => {
+      {ONBOARDING_DATA?.map((_, index) => {
         const activeWidth = wp(6.66);
         const inactiveWidth = wp(2.66);
         const dotStyle = useAnimatedStyle(() => {
@@ -133,7 +110,7 @@ export default function Onboarding(): React.JSX.Element {
             />
           </Animated.View>
 
-          {ONBOARDING_DATA.map((item, index) => {
+          {ONBOARDING_DATA?.map((item, index) => {
             const animatedStyle = useAnimatedStyle(() => {
               const isActive = Math.round(progress.value) === index;
               return {
@@ -160,7 +137,7 @@ export default function Onboarding(): React.JSX.Element {
           })}
         </View>
 
-        {ONBOARDING_DATA.map((item, index) => (
+        {ONBOARDING_DATA?.map((item, index) => (
           <Animated.View
             key={item.key}
             style={[{ top: hp(60.96) }, animatedTextStyles[index]]}

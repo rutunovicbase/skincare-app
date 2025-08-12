@@ -12,4 +12,5 @@ export const colors = {
   primaryBorder: 'rgba(201, 239, 101, 0.5)',
   subheadingText: 'rgba(26, 26, 26, 0.6)',
   resendText: 'rgba(4, 102, 200, 1)',
+  blackBorder: 'rgba(0, 0, 0, 0.3)',
 };

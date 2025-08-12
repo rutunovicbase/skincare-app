@@ -6,12 +6,7 @@ import { fontSize, goBack, hp, wp } from '../Helpers/globalFunction';
 import OnboardingHeader from '../Components/common/OnboardingHeader';
 import { fonts } from '../Constant/Fonts';
 import LinearButton from '../Components/common/LinearButton';
-
-const LANGUAGES = [
-  { label: 'English', code: 'en', icon: 'A' },
-  { label: 'हिंदी ', code: 'hi', icon: 'अ' },
-  { label: 'ગુજરાતી', code: 'gu', icon: 'અ' },
-];
+import { languages } from '../Constant/Constant';
 
 function SelectLanguage(): React.JSX.Element {
   const [selectedLanguage, setSelectedLanguage] = useState<string>('en');
@@ -31,7 +26,7 @@ function SelectLanguage(): React.JSX.Element {
           Your app experience will be in this language.
         </Text>
 
-        {LANGUAGES.map(lang => (
+        {languages?.map(lang => (
           <TouchableOpacity
             key={lang.code}
             style={[

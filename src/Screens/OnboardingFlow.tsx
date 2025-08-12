@@ -3,12 +3,15 @@ import { View, StyleSheet, Dimensions, Keyboard } from 'react-native';
 import OnboardingHeader from '../Components/common/OnboardingHeader';
 import ProgressBar from '../Components/common/ProgressBar';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { wp, hp } from '../Helpers/globalFunction';
+import { wp, hp, navigate } from '../Helpers/globalFunction';
 import { colors } from '../Constant/Colors';
 import EnterName from './EnterName';
 import SelectGender from './SelectGender';
 import Animated, { useSharedValue, withTiming } from 'react-native-reanimated';
 import Birthdate from './Birthdate';
+import YourLifestyle from './YourLifestyle';
+import DietaryPreferences from './DietaryPreferences';
+import YourStressLevel from './YourStressLevel';
 
 const { width } = Dimensions.get('window');
 
@@ -17,11 +20,15 @@ export default function OnboardingFlow() {
   const translateX = useSharedValue(-currentStep * width);
 
   const goToNextStep = () => {
+    console.log('Current Step:', currentStep, steps.length);
+
     if (currentStep < steps.length - 1) {
       Keyboard.dismiss();
       setCurrentStep(prev => prev + 1);
 
       translateX.value = withTiming(-(currentStep + 1) * width);
+    } else {
+      navigate('AddPhoto');
     }
   };
 
@@ -29,6 +36,9 @@ export default function OnboardingFlow() {
     <EnterName onContinue={goToNextStep} />,
     <SelectGender onContinue={goToNextStep} />,
     <Birthdate onContinue={goToNextStep} />,
+    <YourLifestyle onContinue={goToNextStep} />,
+    <DietaryPreferences onContinue={goToNextStep} />,
+    <YourStressLevel onContinue={goToNextStep} />,
   ];
 
   return (
@@ -58,7 +68,7 @@ const styles = StyleSheet.create({
   },
   progressContainer: {
     marginTop: hp(2.58),
-    marginBottom: hp(2.46),
+    marginBottom: hp(3.07),
     paddingHorizontal: wp(5.33),
   },
   stepsContainer: {
