@@ -1,12 +1,5 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import React from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors } from '../Constant/Colors';
 import { wp, hp, fontSize } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
@@ -14,20 +7,20 @@ import { icons } from '../Constant/Icons';
 import LinearButton from '../Components/common/LinearButton';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import OnboardingHeader from '../Components/common/OnboardingHeader';
+import { useTranslation } from 'react-i18next';
 
 export default function AddPhoto() {
+  const { t } = useTranslation();
   return (
     <SafeAreaView style={styles.mainContainer}>
       <OnboardingHeader
         isIcon
-        title="Just one more tap "
+        title={t('JustOneMoreTap')}
         titleStyle={styles.title}
       />
       <View style={styles.content}>
-        <Text style={styles.title}>Add Your Profile Picture</Text>
-        <Text style={styles.subTitle}>
-          Capture or upload a photo to set your profile picture.
-        </Text>
+        <Text style={styles.title}>{t('AddYourProfilePicture')}</Text>
+        <Text style={styles.subTitle}>{t('CaptureOrUploadPhoto')}</Text>
         <View style={styles.imageContainer}>
           <Image source={icons.user} style={styles.userImageStyle} />
         </View>
@@ -36,18 +29,18 @@ export default function AddPhoto() {
             <View style={styles.cameraContainer}>
               <Image source={icons.camera} style={styles.cameraIcon} />
             </View>
-            <Text style={styles.imageOptionText}>Camera</Text>
+            <Text style={styles.imageOptionText}>{t('Camera')}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.imageOptionContainer}>
             <View style={styles.cameraContainer}>
               <Image source={icons.gallery} style={styles.galleryIcon} />
             </View>
-            <Text style={styles.imageOptionText}>Gallery</Text>
+            <Text style={styles.imageOptionText}>{t('Gallery')}</Text>
           </TouchableOpacity>
         </View>
       </View>
       <LinearButton
-        title="Continue"
+        title={t('Continue')}
         onPress={() => {}}
         style={styles.continueButton}
         textStyle={styles.continueButtonText}

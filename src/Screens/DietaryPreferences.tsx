@@ -5,6 +5,7 @@ import { wp, hp, fontSize } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
 import LinearButton from '../Components/common/LinearButton';
 import { dietaryPreferences } from '../Constant/Constant';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
   onContinue: () => void;
@@ -12,6 +13,7 @@ type Props = {
 
 export default function DietaryPreferences({ onContinue }: Props) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const { t } = useTranslation();
 
   const toggleSelection = (title: string) => {
     setSelectedItems(prev =>
@@ -24,8 +26,8 @@ export default function DietaryPreferences({ onContinue }: Props) {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.content}>
-        <Text style={styles.title}>Share Your Dietary Preferences</Text>
-        <Text style={styles.subTitle}>Tell Us About Your Food Habbits</Text>
+        <Text style={styles.title}>{t('ShareYourDietaryPreferences')}</Text>
+        <Text style={styles.subTitle}>{t('TellUsAboutYourFoodHabits')}</Text>
         {dietaryPreferences?.map(item => (
           <TouchableOpacity
             style={[
@@ -43,14 +45,14 @@ export default function DietaryPreferences({ onContinue }: Props) {
                   styles.selectedLifestyleItemText,
               ]}
             >
-              {item.title}
+              {t(item.title)}
             </Text>
           </TouchableOpacity>
         ))}
       </View>
 
       <LinearButton
-        title="Continue"
+        title={t('Continue')}
         onPress={onContinue}
         style={styles.continueButton}
         textStyle={styles.continueButtonText}

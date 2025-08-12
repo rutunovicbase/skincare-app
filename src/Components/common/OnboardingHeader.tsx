@@ -11,6 +11,7 @@ import {
 import { icons } from '../../Constant/Icons';
 import { fontSize, goBack, hp, wp } from '../../Helpers/globalFunction';
 import { fonts } from '../../Constant/Fonts';
+import { useTranslation } from 'react-i18next';
 
 function OnboardingHeader({
   isIcon,
@@ -25,6 +26,7 @@ function OnboardingHeader({
   title?: string;
   titleStyle?: StyleProp<TextStyle>;
 }): React.JSX.Element {
+  const { t } = useTranslation();
   return (
     <View
       style={[
@@ -46,7 +48,7 @@ function OnboardingHeader({
 
       {isSkip ? (
         <TouchableOpacity style={styles.skipButtonStyle}>
-          <Text style={styles.skipText}>Skip</Text>
+          <Text style={styles.skipText}>{t('Skip')}</Text>
         </TouchableOpacity>
       ) : (
         <View />

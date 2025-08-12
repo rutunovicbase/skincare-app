@@ -7,24 +7,34 @@ import OnboardingHeader from '../Components/common/OnboardingHeader';
 import { fonts } from '../Constant/Fonts';
 import LinearButton from '../Components/common/LinearButton';
 import { languages } from '../Constant/Constant';
+import { setLanguage } from '../store/Slices/languageSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../store/store';
+import { useTranslation } from 'react-i18next';
 
 function SelectLanguage(): React.JSX.Element {
-  const [selectedLanguage, setSelectedLanguage] = useState<string>('en');
+  const { language } = useSelector((state: RootState) => state.language);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>(
+    language || 'en',
+  );
+  const dispatch = useDispatch();
+  const { t } = useTranslation();
 
   const handleLanguageSelect = (code: string) => {
     setSelectedLanguage(code);
+  };
+
+  const onPressContinue = () => {
+    dispatch(setLanguage(selectedLanguage));
+    goBack();
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <OnboardingHeader isIcon isPadding={false} />
       <View style={styles.mainContainer}>
-        <Text style={styles.selectLanguageText}>
-          Select the Language You’re Most Comfortable With
-        </Text>
-        <Text style={styles.subHeadingText}>
-          Your app experience will be in this language.
-        </Text>
+        <Text style={styles.selectLanguageText}>{t('SelectLanguage')}</Text>
+        <Text style={styles.subHeadingText}>{t('YourAppLanguage')}</Text>
 
         {languages?.map(lang => (
           <TouchableOpacity
@@ -41,13 +51,13 @@ function SelectLanguage(): React.JSX.Element {
             </View>
           </TouchableOpacity>
         ))}
-        <LinearButton
-          title="Continue"
-          onPress={() => goBack()}
-          style={styles.continueButton}
-          textStyle={styles.continueButtonText}
-        />
       </View>
+      <LinearButton
+        title={t('Continue')}
+        onPress={onPressContinue}
+        style={styles.continueButton}
+        textStyle={styles.continueButtonText}
+      />
     </SafeAreaView>
   );
 }
@@ -59,6 +69,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: wp(5.33),
   },
   mainContainer: {
+    flex: 1,
     marginTop: hp(7.02),
   },
   selectLanguageText: {
@@ -109,12 +120,12 @@ const styles = StyleSheet.create({
     fontSize: fontSize(16),
   },
   continueButton: {
-    marginTop: hp(42.61),
     backgroundColor: colors.primary,
     height: hp(4.92),
     borderRadius: hp(4.92),
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: hp(1.23),
   },
   continueButtonText: {
     fontFamily: fonts.Semibold,

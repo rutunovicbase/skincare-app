@@ -19,10 +19,13 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import LinearButton from '../Components/common/LinearButton';
+import { useTranslation } from 'react-i18next';
 
 function Login(): React.JSX.Element {
   const [isSignIn, setIsSignIn] = useState(true);
   const offset = useSharedValue<number>(wp(0));
+
+  const { t } = useTranslation();
 
   const animatedStyles = useAnimatedStyle(() => ({
     transform: [{ translateX: offset.value }],
@@ -57,10 +60,10 @@ function Login(): React.JSX.Element {
           entering={FadeInLeft.duration(800)}
         >
           <Text style={styles.headingText}>
-            {isSignIn ? 'Welcome' : 'Get started now'}
+            {isSignIn ? t('Welcome') : t('Get started now')}
           </Text>
           <Text style={styles.subHeadingText}>
-            {isSignIn ? 'Sign in to access your account' : 'Create new account'}
+            {isSignIn ? t('SignInToAccess') : t('CreateNewAccount')}
           </Text>
         </Animated.View>
 
@@ -77,7 +80,7 @@ function Login(): React.JSX.Element {
                   isSignIn && styles.activeAuthButtonText,
                 ]}
               >
-                Sign-in
+                {t('SignIn')}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -90,18 +93,18 @@ function Login(): React.JSX.Element {
                   !isSignIn && styles.activeAuthButtonText,
                 ]}
               >
-                Sign-up
+                {t('SignUp')}
               </Text>
             </TouchableOpacity>
           </View>
         </View>
 
         <View style={styles.mobileNoView}>
-          <Text style={styles.mobileNoText}>Mobile no</Text>
+          <Text style={styles.mobileNoText}>{t('MobileNo')}</Text>
           <TextInput style={styles.mobileNoInput} placeholder="0000000000" />
         </View>
         <LinearButton
-          title={isSignIn ? 'Sign-in' : 'Sign-up'}
+          title={isSignIn ? t('SignIn') : t('SignUp')}
           onPress={() => {
             navigate('OTPVerification');
           }}
@@ -110,24 +113,28 @@ function Login(): React.JSX.Element {
         />
         <View style={styles.dividerView}>
           <View style={styles.dividerLine} />
-          <Text style={styles.orTextStyle}>Or login with</Text>
+          <Text style={styles.orTextStyle}>{t('OrLoginWith')}</Text>
           <View style={styles.dividerLine} />
         </View>
         <TouchableOpacity style={styles.loginWithGoogleButton}>
           <Image source={icons.google} style={styles.googleIconStyle} />
-          <Text style={styles.loginWithGoogleText}>Continue with Google</Text>
+          <Text style={styles.loginWithGoogleText}>
+            {t('ContinueWithGoogle')}
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.loginWithAppleButton}>
           <Image source={icons.apple} style={styles.googleIconStyle} />
-          <Text style={styles.loginWithGoogleText}>Continue with Apple</Text>
+          <Text style={styles.loginWithGoogleText}>
+            {t('ContinueWithApple')}
+          </Text>
         </TouchableOpacity>
         <View style={styles.footerContainer}>
           <Text style={styles.dontHaveAccountText}>
-            {isSignIn ? 'Don’t have an account?' : 'Already have an account?'}
+            {isSignIn ? t('DontHaveAccount') : t('AlreadyHaveAccount')}
           </Text>
           <TouchableOpacity style={styles.signUpButtonStyle}>
             <Text style={styles.signUpText}>
-              {isSignIn ? 'Sign-up' : 'Sign-in'}
+              {isSignIn ? t('SignUp') : t('SignIn')}
             </Text>
           </TouchableOpacity>
         </View>

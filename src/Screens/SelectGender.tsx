@@ -6,6 +6,7 @@ import { fonts } from '../Constant/Fonts';
 import { icons } from '../Constant/Icons';
 import LinearButton from '../Components/common/LinearButton';
 import { genders } from '../Constant/Constant';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
   onContinue: () => void;
@@ -14,10 +15,12 @@ type Props = {
 export default function SelectGender({ onContinue }: Props) {
   const [gender, setGender] = useState('');
 
+  const { t } = useTranslation();
+
   return (
     <View style={styles.mainContainer}>
       <View style={styles.content}>
-        <Text style={styles.title}>What’s your pronoun?</Text>
+        <Text style={styles.title}>{t('WhatIsYourPronoun')}</Text>
 
         <View style={styles.genderContainer}>
           {genders?.map(item => (
@@ -38,7 +41,7 @@ export default function SelectGender({ onContinue }: Props) {
                   }
                 />
               </TouchableOpacity>
-              <Text style={styles.genderButtonText}>{item}</Text>
+              <Text style={styles.genderButtonText}>{t(item)}</Text>
             </View>
           ))}
         </View>
@@ -46,11 +49,11 @@ export default function SelectGender({ onContinue }: Props) {
 
       <View style={styles.infoContainer}>
         <Image source={icons.info} style={styles.infoIcon} />
-        <Text style={styles.infoText}>Gender can’t be changed later</Text>
+        <Text style={styles.infoText}>{t('YouCantChangeYourGender')}</Text>
       </View>
 
       <LinearButton
-        title="Continue"
+        title={t('Continue')}
         onPress={onContinue}
         style={styles.continueButton}
         textStyle={styles.continueButtonText}

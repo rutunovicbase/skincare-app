@@ -11,23 +11,20 @@ export const languages = [
 export const ONBOARDING_DATA = [
   {
     key: '1',
-    title: 'Instant Skin Analysis with AI',
-    description:
-      'Get quick and accurate insights about your skin concerns, powered by advanced AI scanning.',
+    titleKey: 'InstantAnalysis',
+    descriptionKey: 'InstantAnalysisInfo',
     image: icons.frame1,
   },
   {
     key: '2',
-    title: 'One-on-One Consultations',
-    description:
-      'Your skin is unique—our experts are here to help with tailored care that fits your needs.',
+    titleKey: 'OneOnOneConsultations',
+    descriptionKey: 'OneOnOneConsultationsInfo',
     image: icons.frame2,
   },
   {
     key: '3',
-    title: 'Video Call with a Skin Specialist',
-    description:
-      'Connect instantly with certified dermatologists from the comfort of your home.',
+    titleKey: 'VideoCallWithSpecialist',
+    descriptionKey: 'VideoCallWithSpecialistInfo',
     image: icons.frame3,
   },
 ];
@@ -35,84 +32,84 @@ export const ONBOARDING_DATA = [
 export const yourLifestyle = [
   {
     key: '1',
-    title: 'Early bird',
+    title: 'EarlyBird',
   },
   {
     key: '2',
-    title: 'Night owl',
+    title: 'NightOwl',
   },
   {
     key: '3',
-    title: 'Irregular sleeper',
+    title: 'IrregularSleeper',
   },
   {
     key: '4',
-    title: 'Short sleeper',
+    title: 'ShortSleeper',
   },
   {
     key: '5',
-    title: 'Long sleeper',
+    title: 'LongSleeper',
   },
   {
     key: '6',
-    title: 'Interrupted sleep',
+    title: 'InterruptedSleep',
   },
 ];
 
 export const dietaryPreferences = [
   {
     key: '1',
-    title: 'Balanced Diet',
+    title: 'BalancedDiet',
   },
   {
     key: '2',
-    title: 'High Sugar Intake',
+    title: 'HighSugarIntake',
   },
   {
     key: '3',
-    title: 'High Dairy Consumption',
+    title: 'HighDairyConsumption',
   },
   {
     key: '4',
-    title: 'Oily / Fried Foods',
+    title: 'OilyFriedFoods',
   },
   {
     key: '5',
-    title: 'Processed / Junk Food',
+    title: 'ProcessedJunkFood',
   },
   {
     key: '6',
-    title: 'Spicy Food Lover',
+    title: 'SpicyFoodLover',
   },
   {
     key: '7',
-    title: 'Vegan / Vegetarian Diet',
+    title: 'VeganVegetarianDiet',
   },
   {
     key: '8',
-    title: 'High Protein / keto',
+    title: 'HighProteinketo',
   },
 ];
 
 export const yourStressLevel = [
   {
     key: '1',
-    title: 'Zen Mode (Low Stress)',
+    title: 'ZenMode',
   },
   {
     key: '2',
-    title: 'Breezy Hustle (Mild Stress)',
+    title: 'BreezyHustle',
   },
   {
     key: '3',
-    title: 'Tidal Taska (Moderate Stress)',
+    title: 'TidalTask',
   },
   {
     key: '4',
-    title: 'Pressure Cooker (High Stress)',
+    title: 'PressureCooker',
   },
   {
     key: '5',
-    title: 'Storm Zone (Very High Stress)',
+    title: 'StormZone',
   },
 ];

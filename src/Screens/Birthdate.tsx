@@ -11,6 +11,9 @@ import DateTimePicker, {
   CalendarYear,
   DateType,
 } from 'react-native-ui-datepicker';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
   onContinue: () => void;
@@ -48,15 +51,19 @@ const DayComponent = (day: CalendarDay) => (
 
 export default function Birthdate({ onContinue }: Props) {
   const [birthdate, setBirthdate] = useState<DateType>();
+  const { language } = useSelector((state: RootState) => state.language);
+
+  const { t } = useTranslation();
 
   return (
     <View style={styles.mainContainer}>
       <View style={styles.content}>
-        <Text style={styles.title}>Please share your date of birth</Text>
+        <Text style={styles.title}>{t('ShareBirthdate')}</Text>
         <DateTimePicker
           mode="single"
           date={birthdate}
           weekdaysFormat="short"
+          locale={language}
           onChange={({ date }: { date: DateType }) => {
             setBirthdate(date as string);
           }}
@@ -93,11 +100,11 @@ export default function Birthdate({ onContinue }: Props) {
 
       <View style={styles.infoContainer}>
         <Image source={icons.info} style={styles.infoIcon} />
-        <Text style={styles.infoText}>Cannot edit birth date later. </Text>
+        <Text style={styles.infoText}>{t('CannotEditBirthdate')} </Text>
       </View>
 
       <LinearButton
-        title="Continue"
+        title={t('Continue')}
         onPress={onContinue}
         style={styles.continueButton}
         textStyle={styles.continueButtonText}

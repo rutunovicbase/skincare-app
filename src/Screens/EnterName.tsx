@@ -5,6 +5,7 @@ import { wp, hp, fontSize } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
 import { icons } from '../Constant/Icons';
 import LinearButton from '../Components/common/LinearButton';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
   onContinue: () => void;
@@ -14,25 +15,26 @@ export default function EnterName({ onContinue }: Props) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
 
+  const { t } = useTranslation();
   return (
     <View style={styles.mainContainer}>
       <View style={styles.content}>
-        <Text style={styles.title}>May I know your name?</Text>
+        <Text style={styles.title}>{t('YourName')}</Text>
 
-        <Text style={styles.inputLabel}>First name</Text>
+        <Text style={styles.inputLabel}>{t('FirstName')}</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter your First name"
+          placeholder={t('EnterYourFirstName')}
           placeholderTextColor={colors.lightText}
           value={firstName}
           onChangeText={setFirstName}
           autoFocus
         />
 
-        <Text style={styles.inputLabel}>Last name</Text>
+        <Text style={styles.inputLabel}>{t('LastName')}</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter your Last name"
+          placeholder={t('EnterYourLastName')}
           placeholderTextColor={colors.lightText}
           value={lastName}
           onChangeText={setLastName}
@@ -41,13 +43,11 @@ export default function EnterName({ onContinue }: Props) {
 
       <View style={styles.infoContainer}>
         <Image source={icons.info} style={styles.infoIcon} />
-        <Text style={styles.infoText}>
-          You can't change your name after this.
-        </Text>
+        <Text style={styles.infoText}>{t('YouCantChangeYourName')}</Text>
       </View>
 
       <LinearButton
-        title="Continue"
+        title={t('Continue')}
         onPress={onContinue}
         style={styles.continueButton}
         textStyle={styles.continueButtonText}

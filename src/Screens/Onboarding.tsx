@@ -17,10 +17,13 @@ import Animated, {
   runOnJS,
 } from 'react-native-reanimated';
 import { ONBOARDING_DATA } from '../Constant/Constant';
+import { useTranslation } from 'react-i18next';
 
 export default function Onboarding(): React.JSX.Element {
   const [step, setStep] = useState<number>(0);
   const progress = useSharedValue(0);
+
+  const { t } = useTranslation();
 
   useAnimatedReaction(
     () => {
@@ -142,8 +145,8 @@ export default function Onboarding(): React.JSX.Element {
             key={item.key}
             style={[{ top: hp(60.96) }, animatedTextStyles[index]]}
           >
-            <Text style={styles.headingText}>{item.title}</Text>
-            <Text style={styles.subHeadingText}>{item.description}</Text>
+            <Text style={styles.headingText}>{t(item.titleKey)}</Text>
+            <Text style={styles.subHeadingText}>{t(item.descriptionKey)}</Text>
           </Animated.View>
         ))}
         <View style={styles.footerContainer}>
@@ -160,7 +163,7 @@ export default function Onboarding(): React.JSX.Element {
                   style={styles.backButtonIconStyle}
                   resizeMode="contain"
                 />
-                <Text style={styles.nextButtonTextStyle}>Back</Text>
+                <Text style={styles.nextButtonTextStyle}>{t('Back')}</Text>
               </TouchableOpacity>
             ) : (
               <View />
@@ -169,7 +172,7 @@ export default function Onboarding(): React.JSX.Element {
               style={styles.nextButtonStyle}
               onPress={handleNext}
             >
-              <Text style={styles.nextButtonTextStyle}>Next</Text>
+              <Text style={styles.nextButtonTextStyle}>{t('Next')}</Text>
               <Image
                 source={icons.back}
                 style={styles.nextButtonIconStyle}

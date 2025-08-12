@@ -20,8 +20,6 @@ export default function OnboardingFlow() {
   const translateX = useSharedValue(-currentStep * width);
 
   const goToNextStep = () => {
-    console.log('Current Step:', currentStep, steps.length);
-
     if (currentStep < steps.length - 1) {
       Keyboard.dismiss();
       setCurrentStep(prev => prev + 1);

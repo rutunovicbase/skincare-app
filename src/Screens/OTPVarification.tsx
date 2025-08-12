@@ -8,23 +8,22 @@ import { fonts } from '../Constant/Fonts';
 import { icons } from '../Constant/Icons';
 import { OtpInput } from 'react-native-otp-entry';
 import LinearButton from '../Components/common/LinearButton';
+import { useTranslation } from 'react-i18next';
 
 function OTPVerification(): React.JSX.Element {
+  const { t } = useTranslation();
   return (
     <SafeAreaView style={styles.container}>
       <OnboardingHeader isIcon />
       <View style={styles.mainContainer}>
-        <Text style={styles.verificationText}>Verification</Text>
+        <Text style={styles.verificationText}>{t('Verification')}</Text>
         <View style={styles.iconContainer}>
           <View style={styles.iconBox}>
             <Image source={icons.OTPVerification} style={styles.iconStyle} />
           </View>
         </View>
-        <Text style={styles.enterCodeText}>Enter authentication code</Text>
-        <Text style={styles.enterCodeTextInfo}>
-          Enter the 4-digit code that we have sent via the phone number or
-          e-mail
-        </Text>
+        <Text style={styles.enterCodeText}>{t('enterCode')}</Text>
+        <Text style={styles.enterCodeTextInfo}>{t('enterCodeInfo')}</Text>
         <OtpInput
           numberOfDigits={4}
           theme={{
@@ -36,14 +35,14 @@ function OTPVerification(): React.JSX.Element {
           }}
         />
         <View style={styles.didNotGetOtpContainer}>
-          <Text style={styles.didntGetOtpText}>Don’t receive OTP?</Text>
+          <Text style={styles.didntGetOtpText}>{t('DontReceiveOtp')}</Text>
           <TouchableOpacity style={styles.signUpButtonStyle}>
-            <Text style={styles.resendText}>Resend</Text>
+            <Text style={styles.resendText}>{t('Resend')}</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.confirmButtonContainer}>
           <LinearButton
-            title="Confirm"
+            title={t('Confirm')}
             style={styles.confirmButton}
             textStyle={styles.confirmTextStyle}
             onPress={() => {
