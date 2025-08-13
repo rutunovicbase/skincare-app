@@ -8,6 +8,124 @@ import SelectLanguage from '../Screens/SelectLanguage';
 import Onboarding from '../Screens/Onboarding';
 import OnboardingFlow from '../Screens/OnboardingFlow';
 import AddPhoto from '../Screens/AddPhoto';
+import {
+  BottomTabBarProps,
+  createBottomTabNavigator,
+} from '@react-navigation/bottom-tabs';
+import CustomTabBar from '../Components/common/CustomTabBar';
+import { CustomTabNavigationOptions } from '../Constant/types';
+import Home from '../Screens/Home';
+import { icons } from '../Constant/Icons';
+import Reports from '../Screens/Reports';
+import Scan from '../Screens/Scan';
+import Orders from '../Screens/Orders';
+import Profile from '../Screens/Profile';
+
+const Tab = createBottomTabNavigator();
+
+export const tabIcons = {
+  home: {
+    filled: icons.homeFill,
+    outline: icons.home,
+  },
+  reports: {
+    filled: icons.reportsFill,
+    outline: icons.reports,
+  },
+  scan: {
+    filled: icons.scanFill,
+    outline: icons.scan,
+  },
+  orders: {
+    filled: icons.ordersFill,
+    outline: icons.orders,
+  },
+  profile: {
+    filled: icons.profileFill,
+    outline: icons.profile,
+  },
+};
+
+const CustomTabBarWrapper = (props: BottomTabBarProps) => (
+  <CustomTabBar {...props} />
+);
+
+function TabNavigator() {
+  return (
+    <Tab.Navigator
+      tabBar={CustomTabBarWrapper}
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Tab.Screen
+        name="Home"
+        component={Home}
+        options={
+          {
+            icon: {
+              filled: tabIcons.home.filled,
+              outline: tabIcons.home.outline,
+            },
+            tabBarLabel: 'Home',
+          } as CustomTabNavigationOptions
+        }
+      />
+      <Tab.Screen
+        name="Reports"
+        component={Reports}
+        options={
+          {
+            icon: {
+              filled: tabIcons.reports.filled,
+              outline: tabIcons.reports.outline,
+            },
+            tabBarLabel: 'Reports',
+          } as CustomTabNavigationOptions
+        }
+      />
+      <Tab.Screen
+        name="Scan"
+        component={Scan}
+        options={
+          {
+            icon: {
+              filled: tabIcons.scan.filled,
+              outline: tabIcons.scan.outline,
+            },
+            tabBarLabel: 'Scan',
+          } as CustomTabNavigationOptions
+        }
+      />
+      <Tab.Screen
+        name="Orders"
+        component={Orders}
+        options={
+          {
+            icon: {
+              filled: tabIcons.orders.filled,
+              outline: tabIcons.orders.outline,
+            },
+            tabBarLabel: 'Orders',
+          } as CustomTabNavigationOptions
+        }
+      />
+      <Tab.Screen
+        name="Profile"
+        component={Profile}
+        options={
+          {
+            icon: {
+              filled: tabIcons.profile.filled,
+              outline: tabIcons.profile.outline,
+            },
+            tabBarLabel: 'Profile',
+          } as CustomTabNavigationOptions
+        }
+      />
+    </Tab.Navigator>
+  );
+}
 
 function RootNavigator(): React.JSX.Element {
   const Stack = createNativeStackNavigator();
@@ -24,6 +142,8 @@ function RootNavigator(): React.JSX.Element {
         <Stack.Screen name="Onboarding" component={Onboarding} />
         <Stack.Screen name="OnboardingFlow" component={OnboardingFlow} />
         <Stack.Screen name="AddPhoto" component={AddPhoto} />
+        <Stack.Screen name="MainTabs" component={TabNavigator} />
+        <Stack.Screen name="Home" component={Home} />
       </Stack.Navigator>
     </NavigationContainer>
   );

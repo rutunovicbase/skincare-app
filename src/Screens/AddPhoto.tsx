@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors } from '../Constant/Colors';
-import { wp, hp, fontSize } from '../Helpers/globalFunction';
+import { wp, hp, fontSize, navigate } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
 import { icons } from '../Constant/Icons';
 import LinearButton from '../Components/common/LinearButton';
@@ -41,7 +41,9 @@ export default function AddPhoto() {
       </View>
       <LinearButton
         title={t('Continue')}
-        onPress={() => {}}
+        onPress={() => {
+          navigate('MainTabs');
+        }}
         style={styles.continueButton}
         textStyle={styles.continueButtonText}
       />
@@ -57,6 +59,7 @@ const styles = StyleSheet.create({
   },
   mainContainer: {
     flex: 1,
+    backgroundColor: colors.background,
   },
   title: {
     fontSize: fontSize(25),
