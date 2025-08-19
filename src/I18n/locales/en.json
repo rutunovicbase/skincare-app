@@ -71,5 +71,12 @@
   "AddYourProfilePicture": "Add Your Profile Picture",
   "CaptureOrUploadPhoto": "Capture or upload a photo to set your profile picture.",
   "Camera": "Camera",
-  "Gallery": "Gallery"
+  "Gallery": "Gallery",
+  "subscriptionTitle": "Unlock Your Personalized Skin",
+  "subscriptionSubTitle": "Get real-time skin analysis, expert advice, and priority support.",
+  "subFeature1": "Personalized Skin Analysis",
+  "subFeature2": "Detailed Skin Reports",
+  "subFeature3": "Access to Expert Consultations",
+  "subFeature4": "Priority Appointment Booking",
+  "subFeature5": "Product Recommendations"
 }

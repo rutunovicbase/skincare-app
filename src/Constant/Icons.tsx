@@ -26,4 +26,12 @@ export const icons = {
   reportsFill: require('../../assets/Images/ReportsFill.png'),
   profileFill: require('../../assets/Images/ProfileFill.png'),
   ordersFill: require('../../assets/Images/OrdersFill.png'),
+  background: require('../../assets/Images/background.png'),
+  backArrows: require('../../assets/Images/backArrows.png'),
+  crownStar: require('../../assets/Images/crownStar.png'),
+  scanner: require('../../assets/Images/scanner.png'),
+  reportIcon: require('../../assets/Images/reportIcon.png'),
+  booking: require('../../assets/Images/booking.png'),
+  moisturizer: require('../../assets/Images/moisturizer.png'),
+  doctor: require('../../assets/Images/doctor.png'),
 };

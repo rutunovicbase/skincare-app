@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     marginHorizontal: wp(5.33),
     marginBottom: hp(1.23),
     borderWidth: 1,
-    borderColor: colors.secondaryGray,
+    borderColor: colors.lightBorder,
   },
   tabButton: {
     flex: 1,

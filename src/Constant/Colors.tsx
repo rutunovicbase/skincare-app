@@ -13,4 +13,8 @@ export const colors = {
   subheadingText: 'rgba(26, 26, 26, 0.6)',
   resendText: 'rgba(4, 102, 200, 1)',
   blackBorder: 'rgba(0, 0, 0, 0.3)',
+  lightBorder: 'rgba(4, 7, 7, 0.1)',
+  blurBackground: 'rgba(255, 255, 255, 0.1)',
+  blurCrown: 'rgba(255, 255, 255, 0.8)',
+  glassBorder: 'rgba(255, 255, 255, 0.45)',
 };
