@@ -143,7 +143,11 @@ function RootNavigator(): React.JSX.Element {
         <Stack.Screen name="Onboarding" component={Onboarding} />
         <Stack.Screen name="OnboardingFlow" component={OnboardingFlow} />
         <Stack.Screen name="AddPhoto" component={AddPhoto} />
-        <Stack.Screen name="MainTabs" component={TabNavigator} />
+        <Stack.Screen
+          name="MainTabs"
+          component={TabNavigator}
+          options={{ animation: 'none' }}
+        />
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Subscription" component={Subscription} />
       </Stack.Navigator>

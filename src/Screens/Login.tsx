@@ -101,7 +101,11 @@ function Login(): React.JSX.Element {
 
         <View style={styles.mobileNoView}>
           <Text style={styles.mobileNoText}>{t('MobileNo')}</Text>
-          <TextInput style={styles.mobileNoInput} placeholder="0000000000" />
+          <TextInput
+            style={styles.mobileNoInput}
+            placeholder="0000000000"
+            placeholderTextColor={colors.textRGBA}
+          />
         </View>
         <LinearButton
           title={isSignIn ? t('SignIn') : t('SignUp')}
