@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: fontSize(25),
+    fontSize: fontSize(22),
     fontFamily: fonts.Semibold,
     color: colors.text,
     marginBottom: hp(2.46),

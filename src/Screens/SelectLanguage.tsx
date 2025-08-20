@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     marginTop: hp(7.02),
   },
   selectLanguageText: {
-    fontSize: fontSize(25),
+    fontSize: fontSize(22),
     fontFamily: fonts.Semibold,
     color: colors.text,
   },

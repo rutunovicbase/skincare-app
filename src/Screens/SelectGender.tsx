@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     marginHorizontal: wp(5.33),
   },
   title: {
-    fontSize: fontSize(25),
+    fontSize: fontSize(22),
     fontFamily: fonts.Semibold,
     color: colors.text,
     marginBottom: hp(5.17),
