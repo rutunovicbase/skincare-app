@@ -59,6 +59,7 @@ function Home() {
             <Image
               source={icons.notification}
               style={styles.notificationIcon}
+              resizeMode="contain"
             />
           </TouchableOpacity>
         </View>
@@ -260,7 +261,6 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    // paddingHorizontal: wp(5.33),
     width: '100%',
     paddingTop: hp(3.07),
   },

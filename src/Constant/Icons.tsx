@@ -45,4 +45,5 @@ export const icons = {
   ReviewOne: require('../../assets/Images/ReviewOne.png'),
   ReviewTwo: require('../../assets/Images/ReviewTwo.png'),
   ReviewThree: require('../../assets/Images/ReviewThree.png'),
+  crossArrow: require('../../assets/Images/crossArrow.png'),
 };
