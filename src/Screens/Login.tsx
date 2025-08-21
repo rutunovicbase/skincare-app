@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    paddingHorizontal: wp(5.06),
+    paddingHorizontal: wp(4.26),
   },
   languageContainer: {
     alignItems: 'flex-end',

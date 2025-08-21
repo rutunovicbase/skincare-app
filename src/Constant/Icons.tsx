@@ -46,4 +46,12 @@ export const icons = {
   ReviewTwo: require('../../assets/Images/ReviewTwo.png'),
   ReviewThree: require('../../assets/Images/ReviewThree.png'),
   crossArrow: require('../../assets/Images/crossArrow.png'),
+  profileRound: require('../../assets/Images/profileRound.png'),
+  delete: require('../../assets/Images/delete.png'),
+  logout: require('../../assets/Images/logout.png'),
+  terms: require('../../assets/Images/terms.png'),
+  settings: require('../../assets/Images/settings.png'),
+  lifestyle: require('../../assets/Images/lifestyle.png'),
+  rateStar: require('../../assets/Images/rateStar.png'),
+  edit: require('../../assets/Images/edit.png'),
 };

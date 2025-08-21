@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
   },
   confirmButtonContainer: {
     width: '100%',
-    paddingHorizontal: wp(5.33),
+    paddingHorizontal: wp(4.26),
   },
 });
 

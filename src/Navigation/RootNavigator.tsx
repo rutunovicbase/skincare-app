@@ -21,6 +21,7 @@ import Scan from '../Screens/Scan';
 import Orders from '../Screens/Orders';
 import Profile from '../Screens/Profile';
 import Subscription from '../Screens/Subscription';
+import ProfileDetails from '../Screens/ProfileDetails';
 
 const Tab = createBottomTabNavigator();
 
@@ -150,6 +151,7 @@ function RootNavigator(): React.JSX.Element {
         />
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Subscription" component={Subscription} />
+        <Stack.Screen name="ProfileDetails" component={ProfileDetails} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -32,7 +32,7 @@ function OnboardingHeader({
       style={[
         styles.container,
         {
-          paddingHorizontal: isPadding ? wp(5.33) : 0,
+          paddingHorizontal: isPadding ? wp(4.26) : 0,
         },
       ]}
     >

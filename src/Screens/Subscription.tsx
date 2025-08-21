@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     tintColor: colors.background,
   },
   commonContainer: {
-    paddingHorizontal: wp(5.33),
+    paddingHorizontal: wp(4.26),
     marginTop: hp(1.23) + (StatusBar.currentHeight ?? 0),
   },
   backButtonContainer: {

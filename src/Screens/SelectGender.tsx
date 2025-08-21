@@ -68,14 +68,14 @@ const styles = StyleSheet.create({
   },
   mainContainer: {
     flex: 1,
-    marginHorizontal: wp(5.33),
+    marginHorizontal: wp(4.26),
   },
   title: {
     fontSize: fontSize(22),
     fontFamily: fonts.Semibold,
     color: colors.text,
     marginBottom: hp(5.17),
-    paddingRight: wp(36.8),
+    paddingRight: wp(38.8),
   },
   infoContainer: {
     flexDirection: 'row',

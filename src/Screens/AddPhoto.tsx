@@ -54,7 +54,7 @@ export default function AddPhoto() {
 const styles = StyleSheet.create({
   content: {
     flex: 1,
-    marginHorizontal: wp(5.33),
+    marginHorizontal: wp(4.26),
     marginTop: hp(7.78),
   },
   mainContainer: {
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     paddingVertical: hp(1.29),
     borderRadius: wp(100),
     marginBottom: hp(1.23),
-    marginHorizontal: wp(5.33),
+    marginHorizontal: wp(4.26),
   },
   continueButtonText: {
     textAlign: 'center',

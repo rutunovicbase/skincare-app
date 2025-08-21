@@ -41,7 +41,6 @@ const renderScene = SceneMap({
 const Reports = () => {
   const [index, setIndex] = useState(0);
 
-  // Animations
   const fadeAnim = useSharedValue(0);
   const slideAnim = useSharedValue(50);
 

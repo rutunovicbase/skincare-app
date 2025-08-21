@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: colors.secondaryPurple,
-    paddingHorizontal: wp(5.33),
+    paddingHorizontal: wp(4.26),
     width: '100%',
     height: hp(8.62),
     justifyContent: 'space-between',
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: hp(3.07),
-    marginHorizontal: wp(5.33),
+    marginHorizontal: wp(4.26),
   },
   starIcon1: {
     width: wp(15.46),
@@ -328,7 +328,8 @@ const styles = StyleSheet.create({
   },
   commonBannerContainer: {
     marginBottom: hp(3.07),
-    marginHorizontal: wp(5.33),
+    marginHorizontal: wp(4.26),
+    alignSelf: 'center',
   },
   bannerImage2: {
     width: wp(89.33),
@@ -439,7 +440,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 2,
-    marginHorizontal: wp(5.33),
+    marginHorizontal: wp(4.26),
   },
   checksGradientImage: {
     height: '100%',
@@ -530,7 +531,7 @@ const styles = StyleSheet.create({
     marginRight: wp(4),
   },
   reviewContentMainContainer: {
-    paddingHorizontal: wp(5.33),
+    paddingHorizontal: wp(4.26),
   },
   reviewNameText: {
     fontFamily: fonts.Medium,

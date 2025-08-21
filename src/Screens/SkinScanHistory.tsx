@@ -16,6 +16,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: hp(3.07),
-    paddingHorizontal: wp(5.33),
+    paddingHorizontal: wp(4.26),
   },
 });

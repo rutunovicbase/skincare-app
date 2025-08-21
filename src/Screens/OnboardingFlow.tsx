@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   progressContainer: {
     marginTop: hp(2.58),
     marginBottom: hp(3.07),
-    paddingHorizontal: wp(5.33),
+    paddingHorizontal: wp(4.26),
   },
   stepsContainer: {
     flexDirection: 'row',

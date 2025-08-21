@@ -59,7 +59,7 @@ export default function YourLifestyle({ onContinue }: Props) {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    marginHorizontal: wp(5.33),
+    marginHorizontal: wp(4.26),
   },
   content: {
     flex: 1,

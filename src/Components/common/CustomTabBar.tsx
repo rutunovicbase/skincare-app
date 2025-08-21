@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     height: hp(6.15),
     backgroundColor: colors.secondaryGray,
     borderRadius: hp(6.16),
-    marginHorizontal: wp(5.33),
+    marginHorizontal: wp(4.26),
     marginBottom: hp(1.23),
     borderWidth: 1,
     borderColor: colors.lightBorder,

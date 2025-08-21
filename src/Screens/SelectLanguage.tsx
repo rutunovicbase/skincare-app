@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    paddingHorizontal: wp(5.33),
+    paddingHorizontal: wp(4.26),
   },
   mainContainer: {
     flex: 1,

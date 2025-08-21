@@ -29,7 +29,7 @@ export default function ConsultHistory() {
 const styles = StyleSheet.create({
   container: {
     paddingTop: hp(3.07),
-    paddingHorizontal: wp(5.33),
+    paddingHorizontal: wp(4.26),
   },
   contentContainer: {
     flex: 1,
