@@ -58,4 +58,5 @@ export const icons = {
   location: require('../../assets/Images/Location.png'),
   support: require('../../assets/Images/support.png'),
   manageSubscription: require('../../assets/Images/manageSubscription.png'),
+  stop: require('../../assets/Images/stop.png'),
 };

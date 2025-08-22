@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Image,
   ScrollView,
@@ -21,8 +21,13 @@ import { fonts } from '../Constant/Fonts';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { icons } from '../Constant/Icons';
 import { Menu } from '../Components/common/Menu';
+import { DeleteAccountModal } from '../Components/ModalComponent/DeleteAccountModal';
+import { LogoutModal } from '../Components/ModalComponent/LogoutModal';
 
 function Profile() {
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+
   const fadeAnim = useSharedValue(0);
   const slideAnim = useSharedValue(50);
 
@@ -52,6 +57,14 @@ function Profile() {
 
   const onPressGeneralSettings = () => {
     navigate('GeneralSettings');
+  };
+
+  const onPressDeleteAccount = () => {
+    setDeleteModalVisible(!deleteModalVisible);
+  };
+
+  const onPressLogout = () => {
+    setLogoutModalVisible(!logoutModalVisible);
   };
 
   return (
@@ -114,13 +127,27 @@ function Profile() {
           menuName="Log out"
           icon={icons.logout}
           iconBackground={colors.primary}
+          onPress={onPressLogout}
         />
         <Menu
           menuName="Delete account"
           icon={icons.delete}
           iconBackground={colors.primary}
+          onPress={onPressDeleteAccount}
         />
       </ScrollView>
+      <DeleteAccountModal
+        visible={deleteModalVisible}
+        onPressBack={onPressDeleteAccount}
+        onPressYes={onPressDeleteAccount}
+        onPressNo={onPressDeleteAccount}
+      />
+      <LogoutModal
+        visible={logoutModalVisible}
+        onPressBack={onPressLogout}
+        onPressYes={onPressLogout}
+        onPressNo={onPressLogout}
+      />
     </SafeAreaView>
   );
 }
