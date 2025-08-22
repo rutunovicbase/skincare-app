@@ -46,6 +46,14 @@ function Profile() {
     navigate('ProfileDetails');
   };
 
+  const onPressLifestyleInsights = () => {
+    navigate('LifestyleInsights');
+  };
+
+  const onPressGeneralSettings = () => {
+    navigate('GeneralSettings');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
@@ -76,12 +84,20 @@ function Profile() {
           menuName="Daily Lifestyle Insights"
           icon={icons.lifestyle}
           iconBackground={colors.primary}
+          onPress={onPressLifestyleInsights}
+        />
+
+        <Menu
+          menuName="Address"
+          icon={icons.location}
+          iconBackground={colors.primary}
         />
         <Text style={styles.sectionTitleText}>Preferences</Text>
         <Menu
           menuName="General settings"
           icon={icons.settings}
           iconBackground={colors.primary}
+          onPress={onPressGeneralSettings}
         />
         <Menu
           menuName="Term & Condition"

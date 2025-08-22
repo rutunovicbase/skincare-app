@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Image,
   ImageProps,
   StyleSheet,
+  Switch,
   Text,
   TouchableOpacity,
   View,
@@ -16,25 +17,39 @@ export function Menu({
   icon,
   iconBackground,
   onPress,
+  isSwitch,
 }: {
   menuName: string;
   icon: ImageProps['source'];
   iconBackground: string;
   onPress?: () => void;
+  isSwitch?: boolean;
 }) {
+  const [isEnabled, setIsEnabled] = useState(false);
+  const toggleSwitch = () => setIsEnabled(previousState => !previousState);
   return (
     <TouchableOpacity style={styles.menuContainer} onPress={onPress}>
       <Text style={styles.menuItem}>{menuName}</Text>
-      <View
-        style={[styles.iconBackground, { backgroundColor: iconBackground }]}
-      >
-        <Image
-          source={icon}
-          style={styles.menuIcon}
-          resizeMode="contain"
-          tintColor={colors.black}
+      {!isSwitch ? (
+        <View
+          style={[styles.iconBackground, { backgroundColor: iconBackground }]}
+        >
+          <Image
+            source={icon}
+            style={styles.menuIcon}
+            resizeMode="contain"
+            tintColor={colors.black}
+          />
+        </View>
+      ) : (
+        <Switch
+          trackColor={{ false: colors.borderGray, true: colors.primary }}
+          thumbColor={colors.black}
+          ios_backgroundColor="#3e3e3e"
+          onValueChange={toggleSwitch}
+          value={isEnabled}
         />
-      </View>
+      )}
     </TouchableOpacity>
   );
 }

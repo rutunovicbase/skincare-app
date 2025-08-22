@@ -54,4 +54,8 @@ export const icons = {
   lifestyle: require('../../assets/Images/lifestyle.png'),
   rateStar: require('../../assets/Images/rateStar.png'),
   edit: require('../../assets/Images/edit.png'),
+  language: require('../../assets/Images/language.png'),
+  location: require('../../assets/Images/Location.png'),
+  support: require('../../assets/Images/support.png'),
+  manageSubscription: require('../../assets/Images/manageSubscription.png'),
 };

@@ -1,23 +1,35 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors } from '../Constant/Colors';
-import { wp, hp, fontSize } from '../Helpers/globalFunction';
+import { wp, hp, fontSize, goBack } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
 import LinearButton from '../Components/common/LinearButton';
 import { yourStressLevel } from '../Constant/Constant';
 import { useTranslation } from 'react-i18next';
+import { Header } from '../Components/common/Header';
 
 type Props = {
-  onContinue: () => void;
+  onContinue?: () => void;
 };
 
 export default function YourStressLevel({ onContinue }: Props) {
   const [selectedItems, setSelectedItems] = useState<string>('');
   const { t } = useTranslation();
 
+  const handleOnContinue = () => {
+    if (onContinue) {
+      onContinue();
+    } else {
+      goBack();
+    }
+  };
+
+  const margin = { marginTop: !onContinue ? hp(7.38) : 0 };
+
   return (
     <View style={styles.mainContainer}>
-      <View style={styles.content}>
+      {!onContinue && <Header isPadding={false} />}
+      <View style={[styles.content, margin]}>
         <Text style={styles.title}>{t('LetsUnderstandYourStressLevels')}</Text>
         <Text style={styles.subTitle}>{t('TellUsAboutYourStressLevel')}</Text>
         {yourStressLevel?.map(item => (
@@ -46,8 +58,8 @@ export default function YourStressLevel({ onContinue }: Props) {
       </View>
 
       <LinearButton
-        title={t('Continue')}
-        onPress={onContinue}
+        title={onContinue ? t('Continue') : 'Save'}
+        onPress={handleOnContinue}
         style={styles.continueButton}
         textStyle={styles.continueButtonText}
       />
@@ -58,7 +70,8 @@ export default function YourStressLevel({ onContinue }: Props) {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    marginHorizontal: wp(4.26),
+    paddingHorizontal: wp(4.26),
+    backgroundColor: colors.background,
   },
   content: {
     flex: 1,

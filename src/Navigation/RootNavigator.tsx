@@ -22,6 +22,11 @@ import Orders from '../Screens/Orders';
 import Profile from '../Screens/Profile';
 import Subscription from '../Screens/Subscription';
 import ProfileDetails from '../Screens/ProfileDetails';
+import LifestyleInsights from '../Screens/LifestyleInsights';
+import YourLifestyle from '../Screens/YourLifestyle';
+import DietaryPreferences from '../Screens/DietaryPreferences';
+import YourStressLevel from '../Screens/YourStressLevel';
+import GeneralSettings from '../Screens/GeneralSettings';
 
 const Tab = createBottomTabNavigator();
 
@@ -152,6 +157,14 @@ function RootNavigator(): React.JSX.Element {
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Subscription" component={Subscription} />
         <Stack.Screen name="ProfileDetails" component={ProfileDetails} />
+        <Stack.Screen name="LifestyleInsights" component={LifestyleInsights} />
+        <Stack.Screen name="YourLifestyle" component={YourLifestyle} />
+        <Stack.Screen
+          name="DietaryPreferences"
+          component={DietaryPreferences}
+        />
+        <Stack.Screen name="YourStressLevel" component={YourStressLevel} />
+        <Stack.Screen name="GeneralSettings" component={GeneralSettings} />
       </Stack.Navigator>
     </NavigationContainer>
   );
