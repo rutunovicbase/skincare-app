@@ -23,10 +23,12 @@ import { icons } from '../Constant/Icons';
 import { Menu } from '../Components/common/Menu';
 import { DeleteAccountModal } from '../Components/ModalComponent/DeleteAccountModal';
 import { LogoutModal } from '../Components/ModalComponent/LogoutModal';
+import { RateUs } from '../Components/ModalComponent/RateUs';
 
 function Profile() {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [rateUsModalVisible, setRateUsModalVisible] = useState(false);
 
   const fadeAnim = useSharedValue(0);
   const slideAnim = useSharedValue(50);
@@ -65,6 +67,10 @@ function Profile() {
 
   const onPressLogout = () => {
     setLogoutModalVisible(!logoutModalVisible);
+  };
+
+  const onPressRateUs = () => {
+    setRateUsModalVisible(!rateUsModalVisible);
   };
 
   return (
@@ -121,6 +127,7 @@ function Profile() {
           menuName="Rate us"
           icon={icons.rateStar}
           iconBackground={colors.primary}
+          onPress={onPressRateUs}
         />
         <Text style={styles.sectionTitleText}>Account settings</Text>
         <Menu
@@ -147,6 +154,12 @@ function Profile() {
         onPressBack={onPressLogout}
         onPressYes={onPressLogout}
         onPressNo={onPressLogout}
+      />
+      <RateUs
+        visible={rateUsModalVisible}
+        onPressBack={onPressRateUs}
+        onPressYes={onPressRateUs}
+        onPressNo={onPressRateUs}
       />
     </SafeAreaView>
   );

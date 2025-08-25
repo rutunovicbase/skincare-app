@@ -17,4 +17,5 @@ export const colors = {
   blurBackground: 'rgba(255, 255, 255, 0.1)',
   blurCrown: 'rgba(255, 255, 255, 0.8)',
   glassBorder: 'rgba(255, 255, 255, 0.45)',
+  cancelRed: 'rgba(255, 56, 60, 1)',
 };

@@ -27,6 +27,7 @@ import YourLifestyle from '../Screens/YourLifestyle';
 import DietaryPreferences from '../Screens/DietaryPreferences';
 import YourStressLevel from '../Screens/YourStressLevel';
 import GeneralSettings from '../Screens/GeneralSettings';
+import ConsultReport from '../Screens/ConsultReport';
 
 const Tab = createBottomTabNavigator();
 
@@ -165,6 +166,7 @@ function RootNavigator(): React.JSX.Element {
         />
         <Stack.Screen name="YourStressLevel" component={YourStressLevel} />
         <Stack.Screen name="GeneralSettings" component={GeneralSettings} />
+        <Stack.Screen name="ConsultReport" component={ConsultReport} />
       </Stack.Navigator>
     </NavigationContainer>
   );

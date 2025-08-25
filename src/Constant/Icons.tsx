@@ -59,4 +59,7 @@ export const icons = {
   support: require('../../assets/Images/support.png'),
   manageSubscription: require('../../assets/Images/manageSubscription.png'),
   stop: require('../../assets/Images/stop.png'),
+  starOutline: require('../../assets/Images/starOutline.png'),
+  starFilled: require('../../assets/Images/starFilled.png'),
+  dummyDoctor: require('../../assets/Images/dummyDoctor.png'),
 };

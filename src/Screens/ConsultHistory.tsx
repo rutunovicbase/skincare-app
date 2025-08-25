@@ -1,37 +1,134 @@
 import React from 'react';
-import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { fontSize, hp, wp } from '../Helpers/globalFunction';
+import {
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { fontSize, hp, navigate, wp } from '../Helpers/globalFunction';
 import { icons } from '../Constant/Icons';
 import { colors } from '../Constant/Colors';
 import { fonts } from '../Constant/Fonts';
+import { Consultation } from '../Constant/types';
+
+const consultations: Consultation[] = [
+  {
+    id: '1',
+    doctor: 'Dr Naira jaswal',
+    specialization: 'Snr. Dermatologist (MD,OD)',
+    Concern: 'Pimples',
+    date: 'Tue, 14 Aug 10:00 A.M.',
+    rating: 4.5,
+    isComplete: false,
+    avatar: icons.dummyDoctor,
+  },
+  {
+    id: '2',
+    doctor: 'Dr Naira jaswal',
+    specialization: 'Snr. Dermatologist (MD,OD)',
+    Concern: 'Pimples',
+    date: 'Tue, 14 Aug 10:00 A.M.',
+    rating: 4.5,
+    isComplete: true,
+    avatar: icons.dummyDoctor,
+  },
+  {
+    id: '3',
+    doctor: 'Dr Naira jaswal',
+    specialization: 'Snr. Dermatologist (MD,OD)',
+    date: 'Tue, 14 Aug 10:00 A.M.',
+    Concern: 'Pimples',
+    rating: 4.5,
+    isComplete: true,
+    avatar: icons.dummyDoctor,
+  },
+];
 
 export default function ConsultHistory() {
-  return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
+  const onPressReport = (item: Consultation) => {
+    navigate('ConsultReport', { item });
+  };
+
+  const renderItem = ({ item }: { item: Consultation }) => (
+    <TouchableOpacity
+      style={styles.card}
+      activeOpacity={0.7}
+      onPress={() => {
+        onPressReport(item);
+      }}
     >
-      <View style={styles.iconContainer}>
-        <View style={styles.iconBox}>
-          <Image
-            source={icons.info}
-            style={styles.iconStyle}
-            tintColor={colors.background}
-          />
+      <Text style={styles.consultStatus}>
+        {item?.isComplete ? 'Complete Consult' : 'Upcoming Consult'}
+      </Text>
+      <View style={styles.cardContainerView}>
+        <View style={styles.cardLeftView}>
+          <Image source={item.avatar} style={styles.doctorAvatar} />
+          <View style={styles.doctorDetails}>
+            <Text style={styles.doctorNameText}>{item.doctor}</Text>
+            <Text style={styles.doctorSpecializationText}>
+              {item.specialization}
+            </Text>
+            <Text style={styles.concernText}>Concern: {item.Concern}</Text>
+            <Text style={styles.dateText}>{item.date}</Text>
+          </View>
+        </View>
+        <View style={styles.cardRightView}>
+          <View>
+            <View style={styles.ratingView}>
+              <Image source={icons.starFilled} style={styles.starStyle} />
+              <Text style={styles.ratingCountText}>{item.rating}</Text>
+            </View>
+            <Text style={styles.ratingText}>Rating</Text>
+          </View>
+          {!item?.isComplete && (
+            <TouchableOpacity style={styles.cancelButton}>
+              <Text style={styles.cancelText}>Cancel</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
-      <Text style={styles.noDataText}>
-        You don’t have any active consultations right now.
-      </Text>
-    </ScrollView>
+    </TouchableOpacity>
+  );
+
+  return (
+    <View style={styles.container}>
+      {consultations.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <View style={styles.iconContainer}>
+            <View style={styles.iconBox}>
+              <Image
+                source={icons.info}
+                style={styles.iconStyle}
+                tintColor={colors.background}
+              />
+            </View>
+          </View>
+          <Text style={styles.noDataText}>
+            You don’t have any active consultations right now.
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={consultations}
+          keyExtractor={item => item.id}
+          renderItem={renderItem}
+          contentContainerStyle={styles.listContainer}
+        />
+      )}
+    </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     paddingTop: hp(3.07),
     paddingHorizontal: wp(4.26),
+    backgroundColor: colors.background,
   },
-  contentContainer: {
+  emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -63,5 +160,100 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: colors.textRGBA,
     paddingHorizontal: wp(16.26),
+  },
+  listContainer: {
+    paddingBottom: hp(2),
+  },
+  card: {
+    backgroundColor: colors.secondaryGray,
+    borderRadius: wp(4),
+    padding: wp(4),
+    marginBottom: hp(1.84),
+    elevation: 2,
+  },
+  consultStatus: {
+    fontSize: fontSize(16),
+    fontFamily: fonts.Semibold,
+    color: colors.text,
+    marginBottom: hp(1.84),
+  },
+  cardContainerView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  cardLeftView: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginRight: wp(2.66),
+  },
+  doctorAvatar: {
+    height: hp(10.46),
+    width: hp(10.46),
+  },
+  doctorDetails: {
+    marginLeft: wp(2.66),
+    width: wp(34.13),
+  },
+  doctorSpecializationText: {
+    fontSize: fontSize(12),
+    fontFamily: fonts.Semibold,
+    color: colors.textRGBA,
+    marginBottom: hp(0.61),
+  },
+  concernText: {
+    color: colors.text,
+    fontSize: fontSize(12),
+    fontFamily: fonts.Semibold,
+    marginBottom: wp(1.33),
+  },
+  dateText: {
+    color: colors.text,
+    fontSize: fontSize(12),
+    fontFamily: fonts.Semibold,
+  },
+  doctorNameText: {
+    fontSize: fontSize(16),
+    fontFamily: fonts.Semibold,
+  },
+  cardRightView: {
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginRight: wp(2.66),
+    flex: 1,
+    height: hp(10.46),
+  },
+  ratingView: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  starStyle: {
+    height: wp(5.33),
+    width: wp(5.33),
+    tintColor: colors.primary,
+    marginRight: wp(0.8),
+  },
+  ratingCountText: {
+    fontSize: fontSize(20),
+    color: colors.secondaryPurple,
+    fontFamily: fonts.Semibold,
+  },
+  ratingText: {
+    fontFamily: fonts.Semibold,
+    fontSize: fontSize(12),
+    textAlign: 'center',
+    color: colors.textRGBA,
+  },
+  cancelButton: {
+    backgroundColor: colors.cancelRed,
+    paddingHorizontal: wp(2.66),
+    paddingVertical: wp(1.33),
+    borderRadius: wp(100),
+  },
+  cancelText: {
+    fontSize: fontSize(16),
+    fontFamily: fonts.Semibold,
+    color: colors.background,
   },
 });

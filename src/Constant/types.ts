@@ -22,3 +22,14 @@ export interface AnimatedTabBarIconProps {
     outline: ImageSourcePropType;
   };
 }
+
+export type Consultation = {
+  id: string;
+  doctor: string;
+  specialization: string;
+  Concern: string;
+  date: string;
+  rating: number;
+  isComplete: boolean;
+  avatar: ImageSourcePropType;
+};
