@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   FlatList,
   Image,
@@ -12,85 +12,122 @@ import { icons } from '../Constant/Icons';
 import { colors } from '../Constant/Colors';
 import { fonts } from '../Constant/Fonts';
 import { Consultation } from '../Constant/types';
+import { CancelConsultationModal } from '../Components/ModalComponent/CancelConsultationModal';
 
 const consultations: Consultation[] = [
   {
     id: '1',
     doctor: 'Dr Naira jaswal',
     specialization: 'Snr. Dermatologist (MD,OD)',
-    Concern: 'Pimples',
+    Concern: ['Pimples', 'Acne', 'Pigmentation', 'Acne', 'Dark circles'],
     date: 'Tue, 14 Aug 10:00 A.M.',
     rating: 4.5,
     isComplete: false,
     avatar: icons.dummyDoctor,
+    isCancelled: false,
   },
   {
     id: '2',
     doctor: 'Dr Naira jaswal',
     specialization: 'Snr. Dermatologist (MD,OD)',
-    Concern: 'Pimples',
+    Concern: ['Pigmentation', 'Pimples'],
     date: 'Tue, 14 Aug 10:00 A.M.',
     rating: 4.5,
-    isComplete: true,
+    isComplete: false,
     avatar: icons.dummyDoctor,
+    isCancelled: true,
   },
   {
     id: '3',
     doctor: 'Dr Naira jaswal',
     specialization: 'Snr. Dermatologist (MD,OD)',
     date: 'Tue, 14 Aug 10:00 A.M.',
-    Concern: 'Pimples',
+    Concern: ['Pimples', 'Dark circles'],
     rating: 4.5,
     isComplete: true,
     avatar: icons.dummyDoctor,
+    isCancelled: false,
   },
 ];
 
 export default function ConsultHistory() {
+  const [cancelConsultModalVisible, setCancelConsultModalVisible] =
+    useState(false);
   const onPressReport = (item: Consultation) => {
-    navigate('ConsultReport', { item });
+    if (item?.isComplete && !item?.isCancelled) {
+      navigate('ConsultReport', { item });
+    }
   };
 
-  const renderItem = ({ item }: { item: Consultation }) => (
-    <TouchableOpacity
-      style={styles.card}
-      activeOpacity={0.7}
-      onPress={() => {
-        onPressReport(item);
-      }}
-    >
-      <Text style={styles.consultStatus}>
-        {item?.isComplete ? 'Complete Consult' : 'Upcoming Consult'}
-      </Text>
-      <View style={styles.cardContainerView}>
-        <View style={styles.cardLeftView}>
-          <Image source={item.avatar} style={styles.doctorAvatar} />
-          <View style={styles.doctorDetails}>
-            <Text style={styles.doctorNameText}>{item.doctor}</Text>
-            <Text style={styles.doctorSpecializationText}>
-              {item.specialization}
-            </Text>
-            <Text style={styles.concernText}>Concern: {item.Concern}</Text>
-            <Text style={styles.dateText}>{item.date}</Text>
-          </View>
-        </View>
-        <View style={styles.cardRightView}>
-          <View>
-            <View style={styles.ratingView}>
-              <Image source={icons.starFilled} style={styles.starStyle} />
-              <Text style={styles.ratingCountText}>{item.rating}</Text>
+  const onPressCancel = () => {
+    setCancelConsultModalVisible(!cancelConsultModalVisible);
+  };
+
+  const renderItem = ({ item }: { item: Consultation }) => {
+    const cancelStyle = {
+      opacity: item?.isCancelled && !item?.isComplete ? 0.5 : 1,
+    };
+    return (
+      <TouchableOpacity
+        style={[styles.card, cancelStyle]}
+        activeOpacity={0.7}
+        onPress={() => {
+          onPressReport(item);
+        }}
+        disabled={item?.isCancelled}
+      >
+        <Text
+          style={[
+            styles.consultStatus,
+            {
+              color:
+                item?.isCancelled && !item?.isComplete
+                  ? colors.cancelRed
+                  : colors.text,
+            },
+          ]}
+        >
+          {item?.isComplete && !item?.isCancelled
+            ? 'Complete Consult'
+            : item?.isCancelled && !item?.isComplete
+            ? 'Cancel Consult'
+            : 'Upcoming Consult'}
+        </Text>
+        <View style={styles.cardContainerView}>
+          <View style={styles.cardLeftView}>
+            <Image source={item.avatar} style={styles.doctorAvatar} />
+            <View style={styles.doctorDetails}>
+              <Text style={styles.doctorNameText}>{item.doctor}</Text>
+              <Text style={styles.doctorSpecializationText}>
+                {item.specialization}
+              </Text>
+              <Text style={styles.concernText}>
+                Concern: {item?.Concern[0]}
+              </Text>
+              <Text style={styles.dateText}>{item.date}</Text>
             </View>
-            <Text style={styles.ratingText}>Rating</Text>
           </View>
-          {!item?.isComplete && (
-            <TouchableOpacity style={styles.cancelButton}>
-              <Text style={styles.cancelText}>Cancel</Text>
-            </TouchableOpacity>
-          )}
+          <View style={styles.cardRightView}>
+            <View>
+              <View style={styles.ratingView}>
+                <Image source={icons.starFilled} style={styles.starStyle} />
+                <Text style={styles.ratingCountText}>{item.rating}</Text>
+              </View>
+              <Text style={styles.ratingText}>Rating</Text>
+            </View>
+            {!item?.isComplete && !item?.isCancelled && (
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={onPressCancel}
+              >
+                <Text style={styles.cancelText}>Cancel</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
-      </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -117,6 +154,12 @@ export default function ConsultHistory() {
           contentContainerStyle={styles.listContainer}
         />
       )}
+      <CancelConsultationModal
+        visible={cancelConsultModalVisible}
+        onPressBack={onPressCancel}
+        onPressYes={onPressCancel}
+        onPressNo={onPressCancel}
+      />
     </View>
   );
 }
@@ -191,6 +234,8 @@ const styles = StyleSheet.create({
   doctorAvatar: {
     height: hp(10.46),
     width: hp(10.46),
+    backgroundColor: colors.secondaryPurple,
+    borderRadius: wp(4),
   },
   doctorDetails: {
     marginLeft: wp(2.66),
@@ -220,7 +265,6 @@ const styles = StyleSheet.create({
   cardRightView: {
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginRight: wp(2.66),
     flex: 1,
     height: hp(10.46),
   },
@@ -252,7 +296,7 @@ const styles = StyleSheet.create({
     borderRadius: wp(100),
   },
   cancelText: {
-    fontSize: fontSize(16),
+    fontSize: fontSize(14),
     fontFamily: fonts.Semibold,
     color: colors.background,
   },

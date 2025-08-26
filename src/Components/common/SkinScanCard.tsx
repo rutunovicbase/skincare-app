@@ -5,9 +5,9 @@ import { fontSize, hp, wp } from '../../Helpers/globalFunction';
 import { fonts } from '../../Constant/Fonts';
 import { icons } from '../../Constant/Icons';
 
-export function SkinScanCard() {
+export function SkinScanCard({ onPress }: { onPress: () => void }) {
   return (
-    <TouchableOpacity style={styles.card} activeOpacity={0.7}>
+    <TouchableOpacity style={styles.card} activeOpacity={0.7} onPress={onPress}>
       <View style={styles.titleView}>
         <Text style={styles.title}>Face skin scan</Text>
         <Image source={icons.crossArrow} style={styles.crossArrowIcon} />

@@ -27,9 +27,10 @@ export type Consultation = {
   id: string;
   doctor: string;
   specialization: string;
-  Concern: string;
+  Concern: string[];
   date: string;
   rating: number;
-  isComplete: boolean;
+  isComplete?: boolean;
   avatar: ImageSourcePropType;
+  isCancelled?: boolean;
 };

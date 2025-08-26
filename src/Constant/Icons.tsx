@@ -62,4 +62,8 @@ export const icons = {
   starOutline: require('../../assets/Images/starOutline.png'),
   starFilled: require('../../assets/Images/starFilled.png'),
   dummyDoctor: require('../../assets/Images/dummyDoctor.png'),
+  clock: require('../../assets/Images/clock.png'),
+  calendar: require('../../assets/Images/calendar.png'),
+  detailsUser: require('../../assets/Images/detailsUser.png'),
+  subscriptionBorder: require('../../assets/Images/subscriptionBorder.png'),
 };

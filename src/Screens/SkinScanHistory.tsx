@@ -1,13 +1,16 @@
 import React from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
-import { hp, wp } from '../Helpers/globalFunction';
+import { hp, navigate, wp } from '../Helpers/globalFunction';
 import { SkinScanCard } from '../Components/common/SkinScanCard';
 
 export default function SkinScanHistory() {
+  const onPressCard = () => {
+    navigate('Details');
+  };
   return (
     <ScrollView style={styles.container}>
-      <SkinScanCard />
-      <SkinScanCard />
+      <SkinScanCard onPress={onPressCard} />
+      <SkinScanCard onPress={onPressCard} />
     </ScrollView>
   );
 }
