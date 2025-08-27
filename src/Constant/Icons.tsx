@@ -66,4 +66,6 @@ export const icons = {
   calendar: require('../../assets/Images/calendar.png'),
   detailsUser: require('../../assets/Images/detailsUser.png'),
   subscriptionBorder: require('../../assets/Images/subscriptionBorder.png'),
+  blur1: require('../../assets/Images/Blur1.png'),
+  blur2: require('../../assets/Images/Blur2.png'),
 };

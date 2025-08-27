@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Image,
   ImageBackground,
@@ -15,10 +15,62 @@ import { colors } from '../Constant/Colors';
 import { useTranslation } from 'react-i18next';
 import { fonts } from '../Constant/Fonts';
 import SubscriptionFeature from '../Components/common/SubscriptionFeature';
-import { BlurView } from '@react-native-community/blur';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+} from 'react-native-reanimated';
+import LinearButton from '../Components/common/LinearButton';
+
+const plans = [
+  {
+    name: 'Basic',
+    monthly: '199₹',
+    yearly: '2399₹',
+  },
+  {
+    name: 'Standard',
+    monthly: '299₹',
+    yearly: '4199₹',
+  },
+  {
+    name: 'Premium',
+    monthly: '499₹',
+    yearly: '5999₹',
+  },
+];
 
 function Subscription() {
   const { t } = useTranslation();
+
+  const [selectedPlan, setSelectedPlan] = useState(0);
+  const prevSelected = useRef(0);
+
+  const animatedHeights = plans.map(() => useSharedValue(hp(12.31)));
+
+  const handleSelect = useCallback(
+    (index: number) => {
+      if (index === selectedPlan) return;
+
+      animatedHeights[prevSelected.current].value = withSpring(hp(12.31), {
+        damping: 20,
+        stiffness: 200,
+      });
+
+      animatedHeights[index].value = withSpring(hp(15.39), {
+        damping: 20,
+        stiffness: 200,
+      });
+
+      prevSelected.current = index;
+      setSelectedPlan(index);
+    },
+    [animatedHeights, selectedPlan],
+  );
+
+  useEffect(() => {
+    animatedHeights[selectedPlan].value = hp(15.39);
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -86,35 +138,79 @@ function Subscription() {
                 featureTitle={t('subFeature5')}
               />
             </View>
-            {/* <View style={styles.planContainer}>
-              <View>
-                <View style={styles.planTitle}>
-                  <BlurView
-                    blurAmount={15}
-                    style={{ position: 'absolute' }}
-                    blurType="light"
-                  />
-                  <Text style={styles.planTitleText}>Basic</Text>
-                </View>
-
-                <View style={styles.planView}></View>
-              </View>
-            </View> */}
 
             <View style={styles.planContainer}>
-              <View>
-                <View style={styles.planTitle}>
-                  <BlurView
-                    blurAmount={50}
-                    blurType="light"
-                    reducedTransparencyFallbackColor="rgba(255,255,255,0.2)"
-                  />
-                  <Text style={styles.planTitleText}>Basic</Text>
-                </View>
+              {plans.map((plan, index) => {
+                const isSelected = selectedPlan === index;
+                const animatedStyle = useAnimatedStyle(() => ({
+                  height: animatedHeights[index].value,
+                }));
 
-                <View style={styles.planView}></View>
-              </View>
+                return (
+                  <TouchableOpacity
+                    key={index}
+                    activeOpacity={0.8}
+                    onPress={() => handleSelect(index)}
+                  >
+                    <Animated.View
+                      style={[
+                        styles.planView,
+                        animatedStyle,
+                        isSelected && styles.selectedPlanView,
+                      ]}
+                    >
+                      {isSelected ? (
+                        <View style={styles.planTitle}>
+                          <Text style={styles.planTitleText}>{plan.name}</Text>
+                        </View>
+                      ) : (
+                        <Text
+                          style={[
+                            styles.planTitleText,
+                            { color: colors.subscriptionBlurText },
+                          ]}
+                        >
+                          {plan.name}
+                        </Text>
+                      )}
+                      <Text
+                        style={[
+                          styles.priceTextStyle,
+                          {
+                            marginTop: isSelected ? hp(1.35) : 0,
+                            color: isSelected
+                              ? colors.background
+                              : colors.subscriptionBlurText,
+                          },
+                        ]}
+                      >
+                        {plan.monthly}/{' '}
+                        <Text style={styles.timePeriodStyle}>monthly</Text>
+                      </Text>
+                      <Text style={styles.perYearPrice}>
+                        {plan.yearly}/ yearly
+                      </Text>
+                    </Animated.View>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
+          </View>
+          <View style={styles.continueButtonContainer}>
+            <View style={styles.infoContainer}>
+              <Image
+                source={icons.info}
+                style={styles.infoIcon}
+                tintColor={colors.subscriptionBlurText}
+              />
+              <Text style={styles.infoText}>Terms & conditions, policies.</Text>
+            </View>
+            <LinearButton
+              title="Subscribe now"
+              onPress={() => {}}
+              style={styles.continueButton}
+              textStyle={styles.continueButtonText}
+            />
           </View>
         </SafeAreaView>
       </ImageBackground>
@@ -123,10 +219,6 @@ function Subscription() {
 }
 
 const styles = StyleSheet.create({
-  absolute: {
-    ...StyleSheet.absoluteFillObject, // fills parent fully
-    borderRadius: 8, // optional, match container rounding
-  },
   container: {
     flex: 1,
   },
@@ -203,21 +295,19 @@ const styles = StyleSheet.create({
   planContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-end',
   },
   planView: {
-    height: wp(26.66),
     width: wp(26.66),
     borderWidth: 1,
     borderColor: colors.glassBorder,
     borderRadius: wp(4),
     backgroundColor: colors.blurBackground,
+    padding: wp(1.33),
   },
   planTitle: {
     height: hp(3.32),
     borderRadius: wp(2.66),
-    marginHorizontal: wp(2.66),
-    top: hp(1.84),
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -227,6 +317,64 @@ const styles = StyleSheet.create({
     fontSize: fontSize(14),
     fontFamily: fonts.Semibold,
     color: colors.background,
+    textAlign: 'center',
+  },
+  priceTextStyle: {
+    textAlign: 'center',
+    color: colors.background,
+    fontSize: fontSize(25),
+    fontFamily: fonts.Medium,
+    marginBottom: hp(0.98),
+  },
+  timePeriodStyle: {
+    fontSize: fontSize(16),
+  },
+  perYearPrice: {
+    fontSize: fontSize(12),
+    fontFamily: fonts.Medium,
+    textAlign: 'center',
+    color: colors.subscriptionBlurText,
+    marginBottom: wp(1.33),
+  },
+  selectedPlanView: {
+    borderColor: colors.background,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  continueButton: {
+    backgroundColor: colors.primary,
+    paddingVertical: hp(1.29),
+    borderRadius: wp(100),
+    marginBottom: hp(1.23),
+  },
+  continueButtonText: {
+    textAlign: 'center',
+    fontSize: fontSize(16),
+    fontFamily: fonts.Semibold,
+  },
+  continueButtonContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    paddingHorizontal: wp(4.26),
+  },
+  infoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: hp(1.23),
+  },
+  infoIcon: {
+    width: wp(6.66),
+    height: wp(6.66),
+    marginRight: wp(2),
+    resizeMode: 'contain',
+  },
+  infoText: {
+    fontSize: fontSize(14),
+    fontFamily: fonts.Semibold,
+    color: colors.subscriptionBlurText,
   },
 });
 

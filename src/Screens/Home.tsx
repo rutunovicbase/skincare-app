@@ -11,10 +11,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../Constant/Colors';
-import { fontSize, hp, wp } from '../Helpers/globalFunction';
+import { fontSize, hp, navigate, wp } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
 import { icons } from '../Constant/Icons';
-import { BlurView } from '@react-native-community/blur';
 import { FlatList } from 'react-native-gesture-handler';
 
 const data = [
@@ -45,6 +44,9 @@ const data = [
 ];
 
 function Home() {
+  const onPressSubscriptionBanner = () => {
+    navigate('Subscription');
+  };
   return (
     <>
       <StatusBar
@@ -64,6 +66,22 @@ function Home() {
           </TouchableOpacity>
         </View>
         <ScrollView style={styles.scrollView}>
+          <TouchableOpacity
+            style={styles.subscriptionBannerView}
+            onPress={onPressSubscriptionBanner}
+          >
+            <ImageBackground
+              source={icons.subscriptionBorder}
+              style={styles.subscriptionBorderStyle}
+              resizeMode="stretch"
+            >
+              <Image
+                source={icons.subscriptionCrown}
+                style={styles.subBannerIcon}
+              />
+              <Text style={styles.subBannerText}>Access Advanced Features</Text>
+            </ImageBackground>
+          </TouchableOpacity>
           <View style={styles.homeBanner1Container}>
             <Image
               source={icons.star}
@@ -102,15 +120,12 @@ function Home() {
                   consultation
                 </Text>
               </View>
-              <View style={styles.blurViewContainer}>
-                <View style={StyleSheet.absoluteFill}>
-                  <BlurView
-                    style={StyleSheet.absoluteFill}
-                    blurType="light"
-                    blurAmount={10}
-                    reducedTransparencyFallbackColor="white"
-                  />
-                </View>
+
+              <ImageBackground
+                source={icons.blur1}
+                style={styles.blurViewContainer}
+                imageStyle={styles.blurRadiusCommon}
+              >
                 <View style={styles.blurContent}>
                   <Text style={styles.fewClicksText}>
                     Dermatologist is just a few clicks away
@@ -119,7 +134,7 @@ function Home() {
                     <Text style={styles.visitNowText}>Visit now</Text>
                   </TouchableOpacity>
                 </View>
-              </View>
+              </ImageBackground>
             </ImageBackground>
           </View>
           <View style={styles.commonBannerContainer}>
@@ -136,17 +151,12 @@ function Home() {
                 />
               </View>
 
-              <View style={styles.blurViewBanner3Container}>
-                <View style={StyleSheet.absoluteFill}>
-                  <BlurView
-                    style={StyleSheet.absoluteFill}
-                    blurType="light"
-                    blurAmount={10}
-                    reducedTransparencyFallbackColor="white"
-                  />
-                </View>
-
-                <View style={styles.blurBanner3Content}>
+              <ImageBackground
+                source={icons.blur2}
+                style={styles.blurViewBanner3Container}
+                imageStyle={styles.blurRadiusCommon}
+              >
+                <View style={styles.blurContent}>
                   <Text style={styles.fullSkinAnalysisText}>
                     Full Skin Analysis Report
                   </Text>
@@ -154,7 +164,7 @@ function Home() {
                     <Text style={styles.scanNowText}>Scan now</Text>
                   </TouchableOpacity>
                 </View>
-              </View>
+              </ImageBackground>
             </ImageBackground>
           </View>
           <View style={styles.subscriptionContainer}>
@@ -262,7 +272,31 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
     width: '100%',
-    paddingTop: hp(3.07),
+    paddingTop: hp(1.84),
+  },
+  subscriptionBannerView: {
+    paddingHorizontal: wp(4.26),
+    marginBottom: hp(1.84),
+  },
+  subscriptionBorderStyle: {
+    height: hp(3.07),
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  blurRadiusCommon: {
+    borderBottomLeftRadius: wp(4),
+    borderBottomRightRadius: wp(4),
+  },
+  subBannerIcon: {
+    height: wp(4),
+    width: wp(4),
+    marginRight: wp(2.66),
+  },
+  subBannerText: {
+    fontSize: fontSize(16),
+    fontFamily: fonts.Semibold,
   },
   homeBanner1Container: {
     height: hp(18.47),
@@ -354,10 +388,6 @@ const styles = StyleSheet.create({
     height: hp(9.23),
     position: 'absolute',
     bottom: 0,
-    borderBottomStartRadius: wp(4),
-    borderBottomEndRadius: wp(4),
-    overflow: 'hidden',
-    backgroundColor: 'transparent',
   },
   blurContent: {
     flex: 1,
@@ -399,16 +429,6 @@ const styles = StyleSheet.create({
     height: hp(6.15),
     position: 'absolute',
     bottom: 0,
-    borderBottomStartRadius: wp(4),
-    borderBottomEndRadius: wp(4),
-    overflow: 'hidden',
-  },
-  blurBanner3Content: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: wp(4.26),
   },
   fullSkinAnalysisText: {
     fontFamily: fonts.Semibold,

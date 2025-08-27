@@ -18,4 +18,5 @@ export const colors = {
   blurCrown: 'rgba(255, 255, 255, 0.8)',
   glassBorder: 'rgba(255, 255, 255, 0.45)',
   cancelRed: 'rgba(255, 56, 60, 1)',
+  subscriptionBlurText: 'rgba(255, 255, 255, 0.6)',
 };
