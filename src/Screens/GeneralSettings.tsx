@@ -12,6 +12,10 @@ export default function GeneralSettings() {
     navigate('SelectLanguage');
   };
 
+  const onPressManageSubscription = () => {
+    navigate('ManageSubscription');
+  };
+
   return (
     <SafeAreaView style={styles.mainContainer}>
       <Header title="General settings" isPadding />
@@ -39,7 +43,7 @@ export default function GeneralSettings() {
           menuName="Manage subscription"
           icon={icons.manageSubscription}
           iconBackground={colors.primary}
-          onPress={onPressLanguage}
+          onPress={onPressManageSubscription}
         />
       </View>
     </SafeAreaView>

@@ -34,3 +34,17 @@ export type Consultation = {
   avatar: ImageSourcePropType;
   isCancelled?: boolean;
 };
+
+export type MedicineDetails = {
+  name: string;
+  quantitiy: string;
+  mrp: number;
+  discount?: number;
+};
+
+export type BillingProps = {
+  total: number;
+  discount: number;
+  taxes: number;
+  delivery: number;
+};

@@ -68,4 +68,5 @@ export const icons = {
   subscriptionBorder: require('../../assets/Images/subscriptionBorder.png'),
   blur1: require('../../assets/Images/Blur1.png'),
   blur2: require('../../assets/Images/Blur2.png'),
+  orderBox: require('../../assets/Images/orderBox.png'),
 };

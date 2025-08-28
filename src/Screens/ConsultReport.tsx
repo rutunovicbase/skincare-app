@@ -12,7 +12,7 @@ import { Consultation } from '../Constant/types';
 import { Header } from '../Components/common/Header';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../Constant/Colors';
-import { fontSize, goBack, hp, wp } from '../Helpers/globalFunction';
+import { fontSize, goBack, hp, navigate, wp } from '../Helpers/globalFunction';
 import { icons } from '../Constant/Icons';
 import { fonts } from '../Constant/Fonts';
 import LinearButton from '../Components/common/LinearButton';
@@ -33,6 +33,10 @@ export default function ConsultReport(): React.JSX.Element {
     'Fine Lines/Wrinkles: Early signs of aging around the forehead and eyes.',
     'Skin Texture: Uneven surface due to acne and dryness.',
   ];
+
+  const onPressBuyMedicine = () => {
+    navigate('OrderDetails');
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -149,7 +153,7 @@ export default function ConsultReport(): React.JSX.Element {
           title="Buy Medicine"
           style={styles.buyMedicineButton}
           textStyle={styles.buyMedicineText}
-          onPress={goBack}
+          onPress={onPressBuyMedicine}
         />
       </View>
     </SafeAreaView>

@@ -30,6 +30,10 @@ import GeneralSettings from '../Screens/GeneralSettings';
 import ConsultReport from '../Screens/ConsultReport';
 import Details from '../Screens/Details';
 import DiseaseDetails from '../Screens/DiseaseDetails';
+import ManageSubscription from '../Screens/ManageSubscription';
+import OrderDetails from '../Screens/OrderDetails';
+import OrderReview from '../Screens/OrderReview';
+import Address from '../Screens/Address';
 
 const Tab = createBottomTabNavigator();
 
@@ -171,6 +175,13 @@ function RootNavigator(): React.JSX.Element {
         <Stack.Screen name="ConsultReport" component={ConsultReport} />
         <Stack.Screen name="Details" component={Details} />
         <Stack.Screen name="DiseaseDetails" component={DiseaseDetails} />
+        <Stack.Screen
+          name="ManageSubscription"
+          component={ManageSubscription}
+        />
+        <Stack.Screen name="OrderDetails" component={OrderDetails} />
+        <Stack.Screen name="OrderReview" component={OrderReview} />
+        <Stack.Screen name="Address" component={Address} />
       </Stack.Navigator>
     </NavigationContainer>
   );
