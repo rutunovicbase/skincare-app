@@ -69,4 +69,5 @@ export const icons = {
   blur1: require('../../assets/Images/Blur1.png'),
   blur2: require('../../assets/Images/Blur2.png'),
   orderBox: require('../../assets/Images/orderBox.png'),
+  success: require('../../assets/Images/Success.png'),
 };

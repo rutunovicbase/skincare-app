@@ -42,6 +42,13 @@ export type MedicineDetails = {
   discount?: number;
 };
 
+export type OrderStatus = {
+  title: string;
+  status: string;
+  date?: string;
+  onPress: () => void;
+};
+
 export type BillingProps = {
   total: number;
   discount: number;

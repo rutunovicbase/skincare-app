@@ -4,11 +4,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../Constant/Colors';
 import { Header } from '../Components/common/Header';
 import LinearButton from '../Components/common/LinearButton';
-import { fontSize, hp, wp } from '../Helpers/globalFunction';
+import { fontSize, hp, navigate, wp } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
 import { AddressCard } from '../Components/common/AddressCard';
 
 export default function Address(): React.JSX.Element {
+  const onPressAddAddress = () => {
+    navigate('AddAddress');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Header title="Address" isPadding />
@@ -17,7 +21,7 @@ export default function Address(): React.JSX.Element {
           title="Add new address"
           style={styles.addAddressButton}
           textStyle={styles.addAddressButtonText}
-          onPress={() => {}}
+          onPress={onPressAddAddress}
         />
         <View style={styles.orContainer}>
           <View style={styles.dividerStyle} />

@@ -113,3 +113,30 @@ export const yourStressLevel = [
     title: 'StormZone',
   },
 ];
+
+export const cancelReasons = [
+  {
+    key: '1',
+    title: 'Ordered the wrong medicine/product',
+  },
+  {
+    key: '2',
+    title: 'No longer need it',
+  },
+  {
+    key: '3',
+    title: 'Delivery time is too long',
+  },
+  {
+    key: '4',
+    title: 'Concern about product quality or authenticity',
+  },
+  {
+    key: '5',
+    title: 'Duplicate order by mistake',
+  },
+  {
+    key: '6',
+    title: 'Payment issue',
+  },
+];

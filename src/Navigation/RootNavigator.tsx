@@ -34,6 +34,10 @@ import ManageSubscription from '../Screens/ManageSubscription';
 import OrderDetails from '../Screens/OrderDetails';
 import OrderReview from '../Screens/OrderReview';
 import Address from '../Screens/Address';
+import AddAddress from '../Screens/AddAddress';
+import OrderPreview from '../Screens/OrderPreview';
+import CancelOrder from '../Screens/CancelOrder';
+import Success from '../Screens/Success';
 
 const Tab = createBottomTabNavigator();
 
@@ -182,6 +186,10 @@ function RootNavigator(): React.JSX.Element {
         <Stack.Screen name="OrderDetails" component={OrderDetails} />
         <Stack.Screen name="OrderReview" component={OrderReview} />
         <Stack.Screen name="Address" component={Address} />
+        <Stack.Screen name="AddAddress" component={AddAddress} />
+        <Stack.Screen name="OrderPreview" component={OrderPreview} />
+        <Stack.Screen name="CancelOrder" component={CancelOrder} />
+        <Stack.Screen name="Success" component={Success} />
       </Stack.Navigator>
     </NavigationContainer>
   );
