@@ -23,6 +23,8 @@ import { icons } from '../Constant/Icons';
 import { hp, wp, fontSize, goBack, navigate } from '../Helpers/globalFunction';
 import RNFS from 'react-native-fs';
 import LinearButton from '../Components/common/LinearButton';
+import { OPEN_AI_KEY } from '@env';
+
 interface SkinAnalysisResult {
   problem: string;
   severity: 'low' | 'medium' | 'high';
@@ -117,10 +119,7 @@ function Scan() {
     const dataUri = `data:${mimeType};base64,${base64}`;
     const myHeaders = new Headers();
     myHeaders.append('Content-Type', 'application/json');
-    myHeaders.append(
-      'Authorization',
-      'Bearer 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',
-    );
+    myHeaders.append('Authorization', `Bearer ${OPEN_AI_KEY}`);
 
     const raw = JSON.stringify({
       model: 'gpt-5',
