@@ -70,4 +70,6 @@ export const icons = {
   blur2: require('../../assets/Images/Blur2.png'),
   orderBox: require('../../assets/Images/orderBox.png'),
   success: require('../../assets/Images/Success.png'),
+  flip: require('../../assets/Images/flip.png'),
+  receptionist: require('../../assets/Images/receptionist.png'),
 };

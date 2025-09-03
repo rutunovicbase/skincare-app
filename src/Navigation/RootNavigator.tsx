@@ -38,6 +38,7 @@ import AddAddress from '../Screens/AddAddress';
 import OrderPreview from '../Screens/OrderPreview';
 import CancelOrder from '../Screens/CancelOrder';
 import Success from '../Screens/Success';
+import LiveReview from '../Screens/LiveReview';
 
 const Tab = createBottomTabNavigator();
 
@@ -190,6 +191,7 @@ function RootNavigator(): React.JSX.Element {
         <Stack.Screen name="OrderPreview" component={OrderPreview} />
         <Stack.Screen name="CancelOrder" component={CancelOrder} />
         <Stack.Screen name="Success" component={Success} />
+        <Stack.Screen name="LiveReview" component={LiveReview} />
       </Stack.Navigator>
     </NavigationContainer>
   );

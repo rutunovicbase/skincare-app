@@ -58,6 +58,12 @@ const TabButton: React.FC<TabButtonProps> = ({ onPress, icon }) => {
 const CustomTabBar = ({ state, descriptors }: TabBarProps) => {
   const insets = useSafeAreaInsets();
 
+  const currentRoute = state.routes[state.index].name;
+
+  if (currentRoute === 'Scan') {
+    return null;
+  }
+
   return (
     <View style={[styles.tabBarContainer, { paddingBottom: insets.bottom }]}>
       <View style={styles.tabBar}>
