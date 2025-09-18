@@ -27,8 +27,8 @@ import { AppDispatch, RootState } from '../store/store';
 import { signInWithGoogleIdToken } from '../store/Slices/authSlice';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { GOOGLE_CLIENT_ID } from '@env';
-import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
+import navigateAfterAuth from '../Helpers/navigateAfterAuth';
 
 function Login(): React.JSX.Element {
   const [isSignIn, setIsSignIn] = useState(true);
@@ -97,28 +97,11 @@ function Login(): React.JSX.Element {
   useEffect(() => {
     const redirectAfterAuth = async () => {
       if (!isAuthenticated || !authUser?.uid) return;
-
-      const snap = await firestore()
-        .collection('users')
-        .doc(authUser.uid)
-        .get();
-      const data = snap.data() || {};
-      const detailsCompleted = !!data.detailsCompleted;
-      if (isNewUser && !detailsCompleted) {
-        navigation.reset({ index: 0, routes: [{ name: 'Onboarding' }] });
-        return;
-      }
-
-      if (!isNewUser && !detailsCompleted) {
-        navigation.reset({ index: 1, routes: [{ name: 'OnboardingFlow' }] });
-        return;
-      }
-
-      navigation.reset({ index: 0, routes: [{ name: 'MainTabs' }] });
+      await navigateAfterAuth(dispatch as any, navigation as any, authUser.uid, isNewUser);
     };
 
     redirectAfterAuth();
-  }, [isAuthenticated, isNewUser, authUser?.uid, navigation]);
+  }, [isAuthenticated, isNewUser, authUser?.uid, navigation, dispatch]);
 
   return (
     <SafeAreaView style={styles.container}>

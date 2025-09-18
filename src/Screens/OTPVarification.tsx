@@ -3,7 +3,7 @@ import OnboardingHeader from '../Components/common/OnboardingHeader';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { colors } from '../Constant/Colors';
-import { commonAction, fontSize, hp, wp } from '../Helpers/globalFunction';
+import { fontSize, hp, wp } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
 import { icons } from '../Constant/Icons';
 import { OtpInput } from 'react-native-otp-entry';
@@ -14,7 +14,9 @@ import { RootStackParamList } from '../Constant/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import firestore from '@react-native-firebase/firestore';
 import { useDispatch } from 'react-redux';
-import { setAuthenticatedUser } from '../store/Slices/authSlice';
+import { setAuthenticatedUser, setIsNewUser } from '../store/Slices/authSlice';
+import { AppDispatch } from '../store/store';
+import navigateAfterAuth from '../Helpers/navigateAfterAuth';
 
 type OTPVerificationRouteProp = RouteProp<
   RootStackParamList,
@@ -30,20 +32,21 @@ type Props = {
   navigation: OTPVerificationNavProp;
 };
 
-function OTPVerification({ route }: Props): React.JSX.Element {
+function OTPVerification({ route, navigation }: Props): React.JSX.Element {
   const { t } = useTranslation();
 
   const { confirmation } = route.params;
   const [code, setCode] = useState('');
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const handleConfirmCode = async () => {
     try {
       const result = await confirmation.confirm(code);
 
       if (result?.user) {
-        // Upsert user profile to Firestore
         const user = result.user;
+        console.log('🚀 ~ handleConfirmCode ~ user:', user);
+
         await firestore()
           .collection('users')
           .doc(user.uid)
@@ -52,25 +55,29 @@ function OTPVerification({ route }: Props): React.JSX.Element {
               uid: user.uid,
               email: user.email ?? null,
               providerId: 'phone',
+              phoneNumber: user?.phoneNumber ?? null,
             },
             { merge: true },
           );
 
-        // Sync to Redux
         dispatch(
           setAuthenticatedUser({
             uid: user.uid,
             email: user.email ?? null,
             emailVerified: !!user.emailVerified,
             providerId: 'phone',
+            phoneNumber: user?.phoneNumber ?? null,
           }),
         );
 
-        if (result?.additionalUserInfo?.isNewUser) {
-          commonAction('Onboarding');
-        } else {
-          commonAction('MainTabs');
-        }
+        dispatch(setIsNewUser(!!result?.additionalUserInfo?.isNewUser));
+
+        await navigateAfterAuth(
+          dispatch as any,
+          navigation as any,
+          user.uid,
+          !!result?.additionalUserInfo?.isNewUser,
+        );
       }
     } catch (error) {}
   };

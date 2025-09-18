@@ -5,37 +5,45 @@ import { wp, hp, fontSize, goBack } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
 import LinearButton from '../Components/common/LinearButton';
 import { yourLifestyle as defaultLifestyle } from '../Constant/Constant';
-import {
-  fetchAndActivateConfig,
-  getLocalizedList,
-} from '../Helpers/remoteConfig';
+// Removed screen-level fetch; lists are prefetched at app level
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header } from '../Components/common/Header';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import { RootState } from '../store/store';
+import { useSelector } from 'react-redux';
 
 type Props = {
   onContinue?: () => void;
 };
 
 export default function YourLifestyle({ onContinue }: Props) {
-  const [selectedItems, setSelectedItems] = useState<string>('');
+  const userInfo = useSelector((state: RootState) => state.auth.user);
+  const language = useSelector((state: RootState) => state.language.language);
+  const cachedList = useSelector(
+    (state: RootState) => state.remoteConfig.lists.yourLifestyle?.[language],
+  );
+  const [selectedId, setSelectedId] = useState<string>(
+    userInfo?.lifestyle || '',
+  );
   const [list, setList] = useState(defaultLifestyle);
 
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const handleOnContinue = async () => {
-    if (selectedItems) {
+    if (selectedId) {
       try {
         const currentUser = auth().currentUser;
         if (currentUser) {
           await firestore()
             .collection('users')
             .doc(currentUser.uid)
-            .set({ lifestyle: selectedItems || null }, { merge: true });
+            .set({ lifestyle: selectedId }, { merge: true });
         }
-      } catch (e) {}
+      } catch (e) {
+        console.log('Error saving lifestyle:', e);
+      }
       if (onContinue) {
         onContinue();
       } else {
@@ -45,15 +53,12 @@ export default function YourLifestyle({ onContinue }: Props) {
   };
 
   useEffect(() => {
-    (async () => {
-      await fetchAndActivateConfig();
-      const localized = getLocalizedList(
-        'yourLifestyle',
-        (t as any).language || 'en',
-      );
-      setList(localized);
-    })();
-  }, []);
+    if (cachedList && (cachedList as any).length > 0) {
+      setList(cachedList as any);
+    } else {
+      setList(defaultLifestyle);
+    }
+  }, [cachedList]);
 
   const margin = { marginTop: !onContinue ? hp(7.38) : 0 };
 
@@ -63,26 +68,23 @@ export default function YourLifestyle({ onContinue }: Props) {
       <View style={[styles.content, margin]}>
         <Text style={styles.title}>{t('YourLifestyle')}</Text>
         <Text style={styles.subTitle}>{t('TellUsAboutYourSleepRoutine')}</Text>
+
         {list?.map(item => (
           <TouchableOpacity
+            key={item.id}
             style={[
               styles.lifestyleItemContainer,
-              selectedItems === item.title &&
-                styles.selectedLifestyleItemContainer,
+              selectedId === item.id && styles.selectedLifestyleItemContainer,
             ]}
-            key={item.key}
-            onPress={() => {
-              setSelectedItems(item.title);
-            }}
+            onPress={() => setSelectedId(item.id)}
           >
             <Text
               style={[
                 styles.lifestyleItemText,
-                selectedItems === item.title &&
-                  styles.selectedLifestyleItemText,
+                selectedId === item.id && styles.selectedLifestyleItemText,
               ]}
             >
-              {t(item.title)}
+              {item.title}
             </Text>
           </TouchableOpacity>
         ))}

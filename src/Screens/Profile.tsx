@@ -24,8 +24,12 @@ import { Menu } from '../Components/common/Menu';
 import { DeleteAccountModal } from '../Components/ModalComponent/DeleteAccountModal';
 import { LogoutModal } from '../Components/ModalComponent/LogoutModal';
 import { RateUs } from '../Components/ModalComponent/RateUs';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
 
 function Profile() {
+  const userInfo = useSelector((state: RootState) => state.auth.user);
+
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const [rateUsModalVisible, setRateUsModalVisible] = useState(false);
@@ -81,12 +85,24 @@ function Profile() {
         <Text style={styles.title}>Profile</Text>
       </Animated.View>
       <View style={styles.profilePhotoContainer}>
-        <Image source={icons.user} style={styles.profilePhoto} />
+        <Image
+          source={
+            userInfo?.profilePhotoURL
+              ? { uri: userInfo.profilePhotoURL }
+              : icons.user
+          }
+          style={styles.profilePhoto}
+        />
         <TouchableOpacity style={styles.editButton}>
           <Image source={icons.edit} style={styles.editIcon} />
         </TouchableOpacity>
       </View>
-      <Text style={styles.profileName}>Magan Mathur</Text>
+      <Text style={styles.profileName}>
+        {userInfo?.displayName ||
+          (userInfo?.firstName && userInfo?.lastName
+            ? `${userInfo.firstName} ${userInfo.lastName}`
+            : userInfo?.email || 'User')}
+      </Text>
       <ScrollView
         style={styles.menuOptionsContainer}
         contentContainerStyle={styles.contentContainerStyle}

@@ -17,7 +17,7 @@ export default function LifestyleInsights() {
   };
 
   const onPressStressLevel = () => {
-    navigate('DietaryPreferences');
+    navigate('YourStressLevel');
   };
 
   return (

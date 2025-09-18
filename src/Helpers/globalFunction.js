@@ -35,3 +35,30 @@ export const resetToRoutes = routes => {
     }),
   );
 };
+
+export const serializeDate = (date: any): string | null => {
+  if (!date) return null;
+
+  if (typeof date.toDate === 'function') {
+    return date.toDate().toISOString();
+  }
+
+  if (date instanceof Date) {
+    return date.toISOString();
+  }
+
+  if (typeof date === 'number') {
+    const ms = date < 1e12 ? date * 1000 : date;
+    return new Date(ms).toISOString();
+  }
+
+  if (typeof date === 'string') {
+    const parsed = new Date(date);
+    if (!isNaN(parsed.getTime())) {
+      return parsed.toISOString();
+    }
+    return date;
+  }
+
+  return String(date);
+};

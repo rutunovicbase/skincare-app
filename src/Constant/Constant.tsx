@@ -31,86 +31,86 @@ export const ONBOARDING_DATA = [
 
 export const yourLifestyle = [
   {
-    key: '1',
-    title: 'EarlyBird',
+    id: 'early_bird',
+    title: 'Early Bird',
   },
   {
-    key: '2',
-    title: 'NightOwl',
+    id: 'night_owl',
+    title: 'Night Owl',
   },
   {
-    key: '3',
-    title: 'IrregularSleeper',
+    id: 'irregular_sleeper',
+    title: 'Irregular Sleeper',
   },
   {
-    key: '4',
-    title: 'ShortSleeper',
+    id: 'short_sleeper',
+    title: 'Short Sleeper',
   },
   {
-    key: '5',
-    title: 'LongSleeper',
+    id: 'long_sleeper',
+    title: 'Long Sleeper',
   },
   {
-    key: '6',
-    title: 'InterruptedSleep',
+    id: 'interrupted_sleep',
+    title: 'Interrupted Sleep',
   },
 ];
 
 export const dietaryPreferences = [
   {
-    key: '1',
-    title: 'BalancedDiet',
+    id: 'balanced_diet',
+    title: 'Balanced Diet',
   },
   {
-    key: '2',
-    title: 'HighSugarIntake',
+    id: 'high_sugar_intake',
+    title: 'High Sugar Intake',
   },
   {
-    key: '3',
-    title: 'HighDairyConsumption',
+    id: 'high_dairy_consumption',
+    title: 'High Dairy Consumption',
   },
   {
-    key: '4',
-    title: 'OilyFriedFoods',
+    id: 'oily_fried_foods',
+    title: 'Oily / Fried Foods',
   },
   {
-    key: '5',
-    title: 'ProcessedJunkFood',
+    id: 'processed_junk_food',
+    title: 'Processed / Junk Food',
   },
   {
-    key: '6',
-    title: 'SpicyFoodLover',
+    id: 'spicy_food_lover',
+    title: 'Spicy Food Lover',
   },
   {
-    key: '7',
-    title: 'VeganVegetarianDiet',
+    id: 'vegan_vegetarian_diet',
+    title: 'Vegan / Vegetarian Diet',
   },
   {
-    key: '8',
-    title: 'HighProteinketo',
+    id: 'high_protein_keto',
+    title: 'High Protein / Keto',
   },
 ];
 
 export const yourStressLevel = [
   {
-    key: '1',
-    title: 'ZenMode',
+    id: 'zen_mode',
+    title: 'Zen Mode (Low Stress)',
   },
   {
-    key: '2',
-    title: 'BreezyHustle',
+    id: 'breezy_hustle',
+    title: 'Breezy Hustle (Mild Stress)',
   },
   {
-    key: '3',
-    title: 'TidalTask',
+    id: 'tidal_task',
+    title: 'Tidal Task (Moderate Stress)',
   },
   {
-    key: '4',
-    title: 'PressureCooker',
+    id: 'pressure_cooker',
+    title: 'Pressure Cooker (High Stress)',
   },
   {
-    key: '5',
-    title: 'StormZone',
+    id: 'storm_zone',
+    title: 'Storm Zone (Very High Stress)',
   },
 ];
 

@@ -1,12 +1,27 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import auth, { GoogleAuthProvider } from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import moment from 'moment';
+import { serializeDate } from '../../Helpers/globalFunction';
 
 export type AuthUser = {
   uid: string | null;
   email: string | null;
   emailVerified: boolean;
   providerId: string | null;
+  profilePhotoURL?: string | null;
+  detailsCompleted?: boolean;
+  createdAt?: any;
+  updatedAt?: any;
+  firstName?: string | null;
+  lastName?: string | null;
+  displayName?: string | null;
+  phoneNumber?: string | null;
+  birthdate?: string | null;
+  gender?: string | null;
+  stressLevel?: string | null;
+  dietaryPreferences?: string[] | null;
+  lifestyle?: string | null;
 };
 
 type AuthState = {
@@ -16,6 +31,8 @@ type AuthState = {
   isAuthenticated: boolean;
   isAppLock: boolean;
   isNewUser?: boolean;
+  isFetchingUserData: boolean;
+  userDataError: string | null;
 };
 
 const initialState: AuthState = {
@@ -25,6 +42,8 @@ const initialState: AuthState = {
   isAuthenticated: false,
   isAppLock: false,
   isNewUser: undefined,
+  isFetchingUserData: false,
+  userDataError: null,
 };
 
 export const signInWithGoogleIdToken = createAsyncThunk(
@@ -50,7 +69,7 @@ export const signInWithGoogleIdToken = createAsyncThunk(
       const userSnap = await userDocRef.get();
       if (!userSnap.exists || !userSnap.data()?.createdAt) {
         await userDocRef.set(
-          { createdAt: firestore.FieldValue.serverTimestamp() },
+          { createdAt: moment().toISOString() },
           { merge: true },
         );
       }
@@ -82,6 +101,48 @@ export const signOut = createAsyncThunk('auth/signOut', async () => {
     await auth().signOut();
   }
 });
+
+export const fetchUserData = createAsyncThunk(
+  'auth/fetchUserData',
+  async (uid: string, { rejectWithValue }) => {
+    try {
+      const userDoc = await firestore().collection('users').doc(uid).get();
+
+      if (!userDoc.exists) {
+        return rejectWithValue('User document not found');
+      }
+
+      const userData = userDoc.data();
+
+      const mappedUser: AuthUser = {
+        uid: userData?.uid || uid,
+        email: userData?.email || null,
+        emailVerified: userData?.emailVerified || false,
+        providerId: userData?.providerId || null,
+        profilePhotoURL: userData?.profilePhotoURL || null,
+        detailsCompleted: userData?.detailsCompleted || false,
+        createdAt: userData?.createdAt || null,
+        updatedAt: userData?.updatedAt || null,
+        firstName: userData?.firstName || null,
+        lastName: userData?.lastName || null,
+        displayName: userData?.displayName || null,
+        phoneNumber: userData?.phoneNumber || null,
+        birthdate: serializeDate(userData?.birthdate) || null,
+        gender: userData?.gender || null,
+        stressLevel: userData?.stressLevel || null,
+        dietaryPreferences: userData?.dietaryPreferences || null,
+        lifestyle: userData?.lifestyle || null,
+      };
+
+      return mappedUser;
+    } catch (error: any) {
+      return rejectWithValue({
+        code: error?.code || 'firestore/unknown',
+        message: error?.message || 'Failed to fetch user data',
+      });
+    }
+  },
+);
 
 const authSlice = createSlice({
   name: 'auth',
@@ -134,6 +195,20 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.error = null;
         state.isAuthenticated = false;
+      })
+      .addCase(fetchUserData.pending, state => {
+        state.isFetchingUserData = true;
+        state.userDataError = null;
+      })
+      .addCase(fetchUserData.fulfilled, (state, action) => {
+        state.isFetchingUserData = false;
+        state.user = action.payload;
+        state.userDataError = null;
+      })
+      .addCase(fetchUserData.rejected, (state, action) => {
+        state.isFetchingUserData = false;
+        state.userDataError =
+          (action.payload as any)?.message || 'Failed to fetch user data';
       });
   },
 });

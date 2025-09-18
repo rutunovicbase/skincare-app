@@ -81,8 +81,10 @@ export default function Birthdate({ onContinue }: Props) {
           date={birthdate}
           weekdaysFormat="short"
           locale={language}
-          onChange={({ date }: { date: DateType }) => {
-            setBirthdate(date as string);
+          onChange={date => {
+            if (date) {
+              setBirthdate(date.date);
+            }
           }}
           styles={{
             year_label: styles.datePickerLabel,

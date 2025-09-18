@@ -5,24 +5,31 @@ import { wp, hp, fontSize, goBack } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
 import LinearButton from '../Components/common/LinearButton';
 import { dietaryPreferences as defaultDiet } from '../Constant/Constant';
-import {
-  fetchAndActivateConfig,
-  getLocalizedList,
-} from '../Helpers/remoteConfig';
+// Removed screen-level fetch; lists are prefetched at app level
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header } from '../Components/common/Header';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import { RootState } from '../store/store';
+import { useSelector } from 'react-redux';
 
 type Props = {
   onContinue?: () => void;
 };
 
 export default function DietaryPreferences({ onContinue }: Props) {
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const userInfo = useSelector((state: RootState) => state.auth.user);
+  const language = useSelector((state: RootState) => state.language.language);
+  const cachedList = useSelector(
+    (state: RootState) => state.remoteConfig.lists.dietaryPreferences?.[language],
+  );
+
+  const [selectedItems, setSelectedItems] = useState<string[]>(
+    userInfo?.dietaryPreferences || [],
+  );
   const [list, setList] = useState(defaultDiet);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const handleOnContinue = async () => {
     if (selectedItems.length) {
@@ -52,15 +59,12 @@ export default function DietaryPreferences({ onContinue }: Props) {
   };
 
   useEffect(() => {
-    (async () => {
-      await fetchAndActivateConfig();
-      const localized = getLocalizedList(
-        'dietaryPreferences',
-        (t as any).language || 'en',
-      );
-      setList(localized);
-    })();
-  }, []);
+    if (cachedList && (cachedList as any).length > 0) {
+      setList(cachedList as any);
+    } else {
+      setList(defaultDiet);
+    }
+  }, [cachedList]);
 
   const margin = { marginTop: !onContinue ? hp(7.38) : 0 };
 
@@ -74,11 +78,11 @@ export default function DietaryPreferences({ onContinue }: Props) {
           <TouchableOpacity
             style={[
               styles.lifestyleItemContainer,
-              selectedItems.includes(item.title) &&
+              selectedItems.includes(item.id) &&
                 styles.selectedLifestyleItemContainer,
             ]}
-            key={item.key}
-            onPress={() => toggleSelection(item.title)}
+            key={item.id}
+            onPress={() => toggleSelection(item.id)}
           >
             <Text
               style={[

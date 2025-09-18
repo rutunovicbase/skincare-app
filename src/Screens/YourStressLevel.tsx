@@ -5,23 +5,31 @@ import { wp, hp, fontSize, goBack } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
 import LinearButton from '../Components/common/LinearButton';
 import { yourStressLevel as defaultStress } from '../Constant/Constant';
-import {
-  fetchAndActivateConfig,
-  getLocalizedList,
-} from '../Helpers/remoteConfig';
+// Removed screen-level fetch; lists are prefetched at app level
 import { useTranslation } from 'react-i18next';
 import { Header } from '../Components/common/Header';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
+import { RootState } from '../store/store';
+import { useSelector } from 'react-redux';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Props = {
   onContinue?: () => void;
 };
 
 export default function YourStressLevel({ onContinue }: Props) {
-  const [selectedItems, setSelectedItems] = useState<string>('');
+  const userInfo = useSelector((state: RootState) => state.auth.user);
+  const language = useSelector((state: RootState) => state.language.language);
+  const cachedList = useSelector(
+    (state: RootState) => state.remoteConfig.lists.yourStressLevel?.[language],
+  );
+
+  const [selectedItems, setSelectedItems] = useState<string>(
+    userInfo?.stressLevel || '',
+  );
   const [list, setList] = useState(defaultStress);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const handleOnContinue = async () => {
     if (selectedItems) {
@@ -43,20 +51,17 @@ export default function YourStressLevel({ onContinue }: Props) {
   };
 
   useEffect(() => {
-    (async () => {
-      await fetchAndActivateConfig();
-      const localized = getLocalizedList(
-        'yourStressLevel',
-        (t as any).language || 'en',
-      );
-      setList(localized);
-    })();
-  }, []);
+    if (cachedList && (cachedList as any).length > 0) {
+      setList(cachedList as any);
+    } else {
+      setList(defaultStress);
+    }
+  }, [cachedList]);
 
   const margin = { marginTop: !onContinue ? hp(7.38) : 0 };
 
   return (
-    <View style={styles.mainContainer}>
+    <SafeAreaView style={styles.mainContainer}>
       {!onContinue && <Header isPadding={false} />}
       <View style={[styles.content, margin]}>
         <Text style={styles.title}>{t('LetsUnderstandYourStressLevels')}</Text>
@@ -65,12 +70,12 @@ export default function YourStressLevel({ onContinue }: Props) {
           <TouchableOpacity
             style={[
               styles.lifestyleItemContainer,
-              selectedItems === item.title &&
+              selectedItems === item.id &&
                 styles.selectedLifestyleItemContainer,
             ]}
-            key={item.key}
+            key={item.id}
             onPress={() => {
-              setSelectedItems(item.title);
+              setSelectedItems(item.id);
             }}
           >
             <Text
@@ -92,7 +97,7 @@ export default function YourStressLevel({ onContinue }: Props) {
         style={styles.continueButton}
         textStyle={styles.continueButtonText}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 

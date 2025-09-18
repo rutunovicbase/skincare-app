@@ -1,5 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Platform, Modal } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Platform,
+  Modal,
+} from 'react-native';
 import { colors } from '../Constant/Colors';
 import { wp, hp, fontSize, navigate } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
@@ -13,15 +21,22 @@ import auth from '@react-native-firebase/auth';
 import storage from '@react-native-firebase/storage';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { Camera, useCameraDevices } from 'react-native-vision-camera';
+import { fetchUserData } from '../store/Slices/authSlice';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../store/store';
+import moment from 'moment';
 
 export default function AddPhoto() {
   const { t } = useTranslation();
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [isCameraVisible, setIsCameraVisible] = useState(false);
-  const [cameraPermission, setCameraPermission] = useState<'authorized' | 'denied' | 'not-determined'>('not-determined');
+  const [cameraPermission, setCameraPermission] = useState<
+    'authorized' | 'denied' | 'not-determined' | 'granted' | 'restricted'
+  >('not-determined');
   const cameraRef = useRef<Camera>(null);
   const devices = useCameraDevices();
-  const device = devices.back;
+  const device = devices.find(d => d.position === 'back');
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     (async () => {
@@ -31,10 +46,10 @@ export default function AddPhoto() {
   }, []);
 
   const requestCameraAndOpen = async () => {
-    if (cameraPermission !== 'authorized') {
+    if (cameraPermission !== 'authorized' && cameraPermission !== 'granted') {
       const result = await Camera.requestCameraPermission();
       setCameraPermission(result);
-      if (result !== 'authorized') return;
+      if (result !== 'authorized' && result !== 'granted') return;
     }
     setIsCameraVisible(true);
   };
@@ -46,7 +61,8 @@ export default function AddPhoto() {
         qualityPrioritization: 'balanced',
       } as any);
       if (photo?.path) {
-        const uri = Platform.OS === 'android' ? 'file://' + photo.path : photo.path;
+        const uri =
+          Platform.OS === 'android' ? 'file://' + photo.path : photo.path;
         setPhotoUri(uri);
         setIsCameraVisible(false);
       }
@@ -55,7 +71,10 @@ export default function AddPhoto() {
 
   const pickFromGallery = async () => {
     try {
-      const res = await launchImageLibrary({ mediaType: 'photo', quality: 0.9 });
+      const res = await launchImageLibrary({
+        mediaType: 'photo',
+        quality: 0.9,
+      });
       const uri = res.assets?.[0]?.uri;
       if (uri) setPhotoUri(uri);
     } catch (e) {}
@@ -84,10 +103,12 @@ export default function AddPhoto() {
           {
             profilePhotoURL: downloadURL ?? null,
             detailsCompleted: true,
-            updatedAt: firestore.FieldValue.serverTimestamp(),
+            updatedAt: moment().toISOString(),
           },
           { merge: true },
         );
+
+      await dispatch(fetchUserData(currentUser.uid));
 
       navigate('MainTabs');
     } catch (e) {
@@ -112,13 +133,19 @@ export default function AddPhoto() {
           )}
         </View>
         <View style={styles.uploadImageContainer}>
-          <TouchableOpacity style={styles.imageOptionContainer} onPress={requestCameraAndOpen}>
+          <TouchableOpacity
+            style={styles.imageOptionContainer}
+            onPress={requestCameraAndOpen}
+          >
             <View style={styles.cameraContainer}>
               <Image source={icons.camera} style={styles.cameraIcon} />
             </View>
             <Text style={styles.imageOptionText}>{t('Camera')}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.imageOptionContainer} onPress={pickFromGallery}>
+          <TouchableOpacity
+            style={styles.imageOptionContainer}
+            onPress={pickFromGallery}
+          >
             <View style={styles.cameraContainer}>
               <Image source={icons.gallery} style={styles.galleryIcon} />
             </View>
@@ -135,7 +162,9 @@ export default function AddPhoto() {
 
       <Modal visible={isCameraVisible} transparent animationType="slide">
         <View style={styles.cameraModalContainer}>
-          {device && cameraPermission === 'authorized' ? (
+          {device &&
+          (cameraPermission === 'authorized' ||
+            cameraPermission === 'granted') ? (
             <Camera
               ref={cameraRef}
               style={styles.cameraView}
@@ -145,10 +174,16 @@ export default function AddPhoto() {
             />
           ) : null}
           <View style={styles.cameraControls}>
-            <TouchableOpacity style={styles.captureButton} onPress={capturePhoto}>
+            <TouchableOpacity
+              style={styles.captureButton}
+              onPress={capturePhoto}
+            >
               <Text style={styles.captureText}>{t('Continue')}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.cancelButton} onPress={() => setIsCameraVisible(false)}>
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => setIsCameraVisible(false)}
+            >
               <Text style={styles.cancelText}>{t('Cancel')}</Text>
             </TouchableOpacity>
           </View>

@@ -1,15 +1,15 @@
 import React, { useEffect } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
 import { colors } from '../Constant/Colors';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAuthenticatedUser } from '../store/Slices/authSlice';
 import { useNavigation } from '@react-navigation/native';
-import { RootState } from '../store/store';
+import { RootState, AppDispatch } from '../store/store';
+import navigateAfterAuth from '../Helpers/navigateAfterAuth';
 
 export default function Splash(): React.JSX.Element {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigation = useNavigation<any>();
   const isNewUser = useSelector((state: RootState) => state.auth.isNewUser);
 
@@ -30,27 +30,16 @@ export default function Splash(): React.JSX.Element {
         }),
       );
 
-      const docRef = firestore().collection('users').doc(currentUser.uid);
-      const snap = await docRef.get();
-      const data = snap.data() || {};
-
-      const detailsCompleted = !!data.detailsCompleted;
-
-      if (isNewUser && !detailsCompleted) {
-        navigation.reset({ index: 0, routes: [{ name: 'Onboarding' }] });
-        return;
-      }
-
-      if (!isNewUser && !detailsCompleted) {
-        navigation.reset({ index: 1, routes: [{ name: 'OnboardingFlow' }] });
-        return;
-      }
-
-      navigation.reset({ index: 0, routes: [{ name: 'MainTabs' }] });
+      await navigateAfterAuth(
+        dispatch,
+        navigation as any,
+        currentUser.uid,
+        isNewUser,
+      );
     };
 
     init();
-  }, [dispatch, navigation]);
+  }, [dispatch, navigation, isNewUser]);
 
   return (
     <View style={styles.container}>
