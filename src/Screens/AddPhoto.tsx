@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Platform, Modal } from 'react-native';
 import { colors } from '../Constant/Colors';
 import { wp, hp, fontSize, navigate } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
@@ -8,9 +8,92 @@ import LinearButton from '../Components/common/LinearButton';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import OnboardingHeader from '../Components/common/OnboardingHeader';
 import { useTranslation } from 'react-i18next';
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
+import storage from '@react-native-firebase/storage';
+import { launchImageLibrary } from 'react-native-image-picker';
+import { Camera, useCameraDevices } from 'react-native-vision-camera';
 
 export default function AddPhoto() {
   const { t } = useTranslation();
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
+  const [isCameraVisible, setIsCameraVisible] = useState(false);
+  const [cameraPermission, setCameraPermission] = useState<'authorized' | 'denied' | 'not-determined'>('not-determined');
+  const cameraRef = useRef<Camera>(null);
+  const devices = useCameraDevices();
+  const device = devices.back;
+
+  useEffect(() => {
+    (async () => {
+      const status = await Camera.getCameraPermissionStatus();
+      setCameraPermission(status);
+    })();
+  }, []);
+
+  const requestCameraAndOpen = async () => {
+    if (cameraPermission !== 'authorized') {
+      const result = await Camera.requestCameraPermission();
+      setCameraPermission(result);
+      if (result !== 'authorized') return;
+    }
+    setIsCameraVisible(true);
+  };
+
+  const capturePhoto = async () => {
+    try {
+      const photo = await cameraRef.current?.takePhoto({
+        flash: 'off',
+        qualityPrioritization: 'balanced',
+      } as any);
+      if (photo?.path) {
+        const uri = Platform.OS === 'android' ? 'file://' + photo.path : photo.path;
+        setPhotoUri(uri);
+        setIsCameraVisible(false);
+      }
+    } catch (e) {}
+  };
+
+  const pickFromGallery = async () => {
+    try {
+      const res = await launchImageLibrary({ mediaType: 'photo', quality: 0.9 });
+      const uri = res.assets?.[0]?.uri;
+      if (uri) setPhotoUri(uri);
+    } catch (e) {}
+  };
+
+  const uploadAndContinue = async () => {
+    try {
+      const currentUser = auth().currentUser;
+      if (!currentUser) {
+        navigate('Login');
+        return;
+      }
+      let downloadURL: string | null = null;
+      if (photoUri) {
+        const fileExt = photoUri.split('.').pop() || 'jpg';
+        const path = `profilePhotos/${currentUser.uid}.${fileExt}`;
+        const ref = storage().ref(path);
+        await ref.putFile(photoUri);
+        downloadURL = await ref.getDownloadURL();
+      }
+
+      await firestore()
+        .collection('users')
+        .doc(currentUser.uid)
+        .set(
+          {
+            profilePhotoURL: downloadURL ?? null,
+            detailsCompleted: true,
+            updatedAt: firestore.FieldValue.serverTimestamp(),
+          },
+          { merge: true },
+        );
+
+      navigate('MainTabs');
+    } catch (e) {
+      navigate('MainTabs');
+    }
+  };
   return (
     <SafeAreaView style={styles.mainContainer}>
       <OnboardingHeader
@@ -22,16 +105,20 @@ export default function AddPhoto() {
         <Text style={styles.title}>{t('AddYourProfilePicture')}</Text>
         <Text style={styles.subTitle}>{t('CaptureOrUploadPhoto')}</Text>
         <View style={styles.imageContainer}>
-          <Image source={icons.user} style={styles.userImageStyle} />
+          {photoUri ? (
+            <Image source={{ uri: photoUri }} style={styles.userImageStyle} />
+          ) : (
+            <Image source={icons.user} style={styles.userImageStyle} />
+          )}
         </View>
         <View style={styles.uploadImageContainer}>
-          <TouchableOpacity style={styles.imageOptionContainer}>
+          <TouchableOpacity style={styles.imageOptionContainer} onPress={requestCameraAndOpen}>
             <View style={styles.cameraContainer}>
               <Image source={icons.camera} style={styles.cameraIcon} />
             </View>
             <Text style={styles.imageOptionText}>{t('Camera')}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.imageOptionContainer}>
+          <TouchableOpacity style={styles.imageOptionContainer} onPress={pickFromGallery}>
             <View style={styles.cameraContainer}>
               <Image source={icons.gallery} style={styles.galleryIcon} />
             </View>
@@ -41,12 +128,32 @@ export default function AddPhoto() {
       </View>
       <LinearButton
         title={t('Continue')}
-        onPress={() => {
-          navigate('MainTabs');
-        }}
+        onPress={uploadAndContinue}
         style={styles.continueButton}
         textStyle={styles.continueButtonText}
       />
+
+      <Modal visible={isCameraVisible} transparent animationType="slide">
+        <View style={styles.cameraModalContainer}>
+          {device && cameraPermission === 'authorized' ? (
+            <Camera
+              ref={cameraRef}
+              style={styles.cameraView}
+              device={device}
+              isActive={isCameraVisible}
+              photo
+            />
+          ) : null}
+          <View style={styles.cameraControls}>
+            <TouchableOpacity style={styles.captureButton} onPress={capturePhoto}>
+              <Text style={styles.captureText}>{t('Continue')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.cancelButton} onPress={() => setIsCameraVisible(false)}>
+              <Text style={styles.cancelText}>{t('Cancel')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -132,5 +239,43 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: fontSize(16),
     fontFamily: fonts.Semibold,
+  },
+  cameraModalContainer: {
+    flex: 1,
+    backgroundColor: colors.black,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cameraView: {
+    width: '100%',
+    height: '80%',
+  },
+  cameraControls: {
+    position: 'absolute',
+    bottom: hp(4),
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+  },
+  captureButton: {
+    backgroundColor: colors.primary,
+    paddingVertical: hp(1.29),
+    paddingHorizontal: wp(6),
+    borderRadius: wp(100),
+  },
+  captureText: {
+    color: colors.text,
+    fontFamily: fonts.Semibold,
+    fontSize: fontSize(16),
+  },
+  cancelButton: {
+    backgroundColor: colors.secondaryGray,
+    paddingVertical: hp(1.29),
+    paddingHorizontal: wp(6),
+    borderRadius: wp(100),
+  },
+  cancelText: {
+    fontFamily: fonts.Semibold,
+    fontSize: fontSize(16),
   },
 });

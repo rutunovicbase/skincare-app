@@ -6,6 +6,8 @@ import { fonts } from '../Constant/Fonts';
 import { icons } from '../Constant/Icons';
 import LinearButton from '../Components/common/LinearButton';
 import { useTranslation } from 'react-i18next';
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 type Props = {
   onContinue: () => void;
@@ -14,6 +16,24 @@ type Props = {
 export default function EnterName({ onContinue }: Props) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+
+  const onPressContinue = async () => {
+    if (firstName && lastName) {
+      try {
+        const currentUser = auth().currentUser;
+        if (currentUser) {
+          await firestore().collection('users').doc(currentUser.uid).set(
+            {
+              firstName,
+              lastName,
+            },
+            { merge: true },
+          );
+        }
+      } catch (e) {}
+      onContinue();
+    }
+  };
 
   const { t } = useTranslation();
   return (
@@ -48,7 +68,7 @@ export default function EnterName({ onContinue }: Props) {
 
       <LinearButton
         title={t('Continue')}
-        onPress={onContinue}
+        onPress={onPressContinue}
         style={styles.continueButton}
         textStyle={styles.continueButtonText}
       />

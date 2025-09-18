@@ -55,3 +55,8 @@ export type BillingProps = {
   taxes: number;
   delivery: number;
 };
+
+export type RootStackParamList = {
+  OTPVerification: { confirmation: any };
+  Onboarding: undefined;
+};

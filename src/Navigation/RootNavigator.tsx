@@ -39,6 +39,7 @@ import OrderPreview from '../Screens/OrderPreview';
 import CancelOrder from '../Screens/CancelOrder';
 import Success from '../Screens/Success';
 import LiveReview from '../Screens/LiveReview';
+import Splash from '../Screens/Splash';
 
 const Tab = createBottomTabNavigator();
 
@@ -151,10 +152,8 @@ function RootNavigator(): React.JSX.Element {
 
   return (
     <NavigationContainer ref={navigationRef}>
-      <Stack.Navigator
-        screenOptions={{ headerShown: false }}
-        initialRouteName="Login"
-      >
+      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={'Splash' as any}>
+        <Stack.Screen name="Splash" component={Splash} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="OTPVerification" component={OTPVerification} />
         <Stack.Screen name="SelectLanguage" component={SelectLanguage} />

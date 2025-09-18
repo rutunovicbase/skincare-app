@@ -18,10 +18,13 @@ import Animated, {
 } from 'react-native-reanimated';
 import { ONBOARDING_DATA } from '../Constant/Constant';
 import { useTranslation } from 'react-i18next';
+import { setIsNewUser } from '../store/Slices/authSlice';
+import { useDispatch } from 'react-redux';
 
 export default function Onboarding(): React.JSX.Element {
   const [step, setStep] = useState<number>(0);
   const progress = useSharedValue(0);
+  const dispatch = useDispatch();
 
   const { t } = useTranslation();
 
@@ -42,6 +45,7 @@ export default function Onboarding(): React.JSX.Element {
     if (progress.value < ONBOARDING_DATA?.length - 1) {
       progress.value = withTiming(progress.value + 1, { duration: 400 });
     } else {
+      dispatch(setIsNewUser(false));
       navigate('OnboardingFlow');
     }
   };

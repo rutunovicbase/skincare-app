@@ -3,15 +3,17 @@ import { persistStore, persistReducer } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import languageReducer from './Slices/languageSlice';
+import authReducer from './Slices/authSlice';
 
 const rootReducer = combineReducers({
   language: languageReducer,
+  auth: authReducer,
 });
 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['language'],
+  whitelist: ['language', 'auth', 'isNewUser'],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

@@ -1,17 +1,80 @@
-import React from 'react';
+import React, { useState } from 'react';
 import OnboardingHeader from '../Components/common/OnboardingHeader';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { colors } from '../Constant/Colors';
-import { fontSize, hp, navigate, wp } from '../Helpers/globalFunction';
+import { commonAction, fontSize, hp, wp } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
 import { icons } from '../Constant/Icons';
 import { OtpInput } from 'react-native-otp-entry';
 import LinearButton from '../Components/common/LinearButton';
 import { useTranslation } from 'react-i18next';
+import { RouteProp } from '@react-navigation/native';
+import { RootStackParamList } from '../Constant/types';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import firestore from '@react-native-firebase/firestore';
+import { useDispatch } from 'react-redux';
+import { setAuthenticatedUser } from '../store/Slices/authSlice';
 
-function OTPVerification(): React.JSX.Element {
+type OTPVerificationRouteProp = RouteProp<
+  RootStackParamList,
+  'OTPVerification'
+>;
+type OTPVerificationNavProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'OTPVerification'
+>;
+
+type Props = {
+  route: OTPVerificationRouteProp;
+  navigation: OTPVerificationNavProp;
+};
+
+function OTPVerification({ route }: Props): React.JSX.Element {
   const { t } = useTranslation();
+
+  const { confirmation } = route.params;
+  const [code, setCode] = useState('');
+  const dispatch = useDispatch();
+
+  const handleConfirmCode = async () => {
+    try {
+      const result = await confirmation.confirm(code);
+
+      if (result?.user) {
+        // Upsert user profile to Firestore
+        const user = result.user;
+        await firestore()
+          .collection('users')
+          .doc(user.uid)
+          .set(
+            {
+              uid: user.uid,
+              email: user.email ?? null,
+              providerId: 'phone',
+            },
+            { merge: true },
+          );
+
+        // Sync to Redux
+        dispatch(
+          setAuthenticatedUser({
+            uid: user.uid,
+            email: user.email ?? null,
+            emailVerified: !!user.emailVerified,
+            providerId: 'phone',
+          }),
+        );
+
+        if (result?.additionalUserInfo?.isNewUser) {
+          commonAction('Onboarding');
+        } else {
+          commonAction('MainTabs');
+        }
+      }
+    } catch (error) {}
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <OnboardingHeader isIcon />
@@ -25,7 +88,7 @@ function OTPVerification(): React.JSX.Element {
         <Text style={styles.enterCodeText}>{t('enterCode')}</Text>
         <Text style={styles.enterCodeTextInfo}>{t('enterCodeInfo')}</Text>
         <OtpInput
-          numberOfDigits={4}
+          numberOfDigits={6}
           theme={{
             containerStyle: styles.otpContainer,
             pinCodeContainerStyle: styles.pinCodeContainer,
@@ -33,6 +96,7 @@ function OTPVerification(): React.JSX.Element {
             focusStickStyle: styles.focusStick,
             focusedPinCodeContainerStyle: styles.activePinCodeContainer,
           }}
+          onTextChange={setCode}
         />
         <View style={styles.didNotGetOtpContainer}>
           <Text style={styles.didntGetOtpText}>{t('DontReceiveOtp')}</Text>
@@ -46,7 +110,7 @@ function OTPVerification(): React.JSX.Element {
             style={styles.confirmButton}
             textStyle={styles.confirmTextStyle}
             onPress={() => {
-              navigate('Onboarding');
+              handleConfirmCode();
             }}
           />
         </View>
@@ -103,7 +167,7 @@ const styles = StyleSheet.create({
   },
   otpContainer: {
     marginTop: hp(2.46),
-    paddingHorizontal: wp(16),
+    paddingHorizontal: wp(4.26),
     marginBottom: hp(2.46),
   },
   pinCodeContainer: {

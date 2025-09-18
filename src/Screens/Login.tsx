@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Image,
   StyleSheet,
@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../Constant/Colors';
@@ -20,12 +21,36 @@ import Animated, {
 } from 'react-native-reanimated';
 import LinearButton from '../Components/common/LinearButton';
 import { useTranslation } from 'react-i18next';
+import auth from '@react-native-firebase/auth';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../store/store';
+import { signInWithGoogleIdToken } from '../store/Slices/authSlice';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { GOOGLE_CLIENT_ID } from '@env';
+import firestore from '@react-native-firebase/firestore';
+import { useNavigation } from '@react-navigation/native';
 
 function Login(): React.JSX.Element {
   const [isSignIn, setIsSignIn] = useState(true);
+  const [phoneNumber, setPhoneNumber] = useState('');
   const offset = useSharedValue<number>(wp(0));
 
   const { t } = useTranslation();
+  const dispatch = useDispatch<AppDispatch>();
+  const navigation = useNavigation<any>();
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.auth.isAuthenticated,
+  );
+  const isNewUser = useSelector((state: RootState) => state.auth.isNewUser);
+  const authUser = useSelector((state: RootState) => state.auth.user);
+
+  useEffect(() => {
+    try {
+      GoogleSignin.configure({
+        webClientId: GOOGLE_CLIENT_ID,
+      });
+    } catch (e) {}
+  }, []);
 
   const animatedStyles = useAnimatedStyle(() => ({
     transform: [{ translateX: offset.value }],
@@ -39,6 +64,61 @@ function Login(): React.JSX.Element {
     setIsSignIn(true);
     offset.value = withTiming(0);
   };
+
+  const handleSendOTP = async () => {
+    if (!phoneNumber) {
+      return;
+    }
+
+    try {
+      const fullPhone = phoneNumber.startsWith('+')
+        ? phoneNumber
+        : '+91' + phoneNumber;
+
+      const confirmation = await auth().signInWithPhoneNumber(fullPhone);
+      navigate('OTPVerification', { confirmation });
+    } catch (error) {}
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      await GoogleSignin.hasPlayServices({
+        showPlayServicesUpdateDialog: true,
+      });
+      const userInfo: any = await GoogleSignin.signIn();
+      const idToken = userInfo?.data?.idToken || userInfo?.idToken;
+      if (!idToken) {
+        return;
+      }
+      dispatch(signInWithGoogleIdToken(idToken));
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    const redirectAfterAuth = async () => {
+      if (!isAuthenticated || !authUser?.uid) return;
+
+      const snap = await firestore()
+        .collection('users')
+        .doc(authUser.uid)
+        .get();
+      const data = snap.data() || {};
+      const detailsCompleted = !!data.detailsCompleted;
+      if (isNewUser && !detailsCompleted) {
+        navigation.reset({ index: 0, routes: [{ name: 'Onboarding' }] });
+        return;
+      }
+
+      if (!isNewUser && !detailsCompleted) {
+        navigation.reset({ index: 1, routes: [{ name: 'OnboardingFlow' }] });
+        return;
+      }
+
+      navigation.reset({ index: 0, routes: [{ name: 'MainTabs' }] });
+    };
+
+    redirectAfterAuth();
+  }, [isAuthenticated, isNewUser, authUser?.uid, navigation]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -73,6 +153,7 @@ function Login(): React.JSX.Element {
             <TouchableOpacity
               style={styles.buttonStyle}
               onPress={onPressSignIn}
+              activeOpacity={1}
             >
               <Text
                 style={[
@@ -86,6 +167,7 @@ function Login(): React.JSX.Element {
             <TouchableOpacity
               style={styles.buttonStyle}
               onPress={onPressSignup}
+              activeOpacity={1}
             >
               <Text
                 style={[
@@ -103,35 +185,44 @@ function Login(): React.JSX.Element {
           <Text style={styles.mobileNoText}>{t('MobileNo')}</Text>
           <TextInput
             style={styles.mobileNoInput}
-            placeholder="0000000000"
+            placeholder="9876543210"
             placeholderTextColor={colors.textRGBA}
+            keyboardType="phone-pad"
+            value={phoneNumber}
+            onChangeText={setPhoneNumber}
           />
         </View>
+
         <LinearButton
           title={isSignIn ? t('SignIn') : t('SignUp')}
-          onPress={() => {
-            navigate('OTPVerification');
-          }}
+          onPress={handleSendOTP}
           style={styles.signInButtonStyle}
           textStyle={styles.signInButtonTextStyle}
         />
+
         <View style={styles.dividerView}>
           <View style={styles.dividerLine} />
           <Text style={styles.orTextStyle}>{t('OrLoginWith')}</Text>
           <View style={styles.dividerLine} />
         </View>
-        <TouchableOpacity style={styles.loginWithGoogleButton}>
+        <TouchableOpacity
+          style={styles.loginWithGoogleButton}
+          onPress={handleGoogleLogin}
+        >
           <Image source={icons.google} style={styles.googleIconStyle} />
           <Text style={styles.loginWithGoogleText}>
             {t('ContinueWithGoogle')}
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.loginWithAppleButton}>
-          <Image source={icons.apple} style={styles.googleIconStyle} />
-          <Text style={styles.loginWithGoogleText}>
-            {t('ContinueWithApple')}
-          </Text>
-        </TouchableOpacity>
+        {Platform.OS !== 'android' && (
+          <TouchableOpacity style={styles.loginWithAppleButton}>
+            <Image source={icons.apple} style={styles.googleIconStyle} />
+            <Text style={styles.loginWithGoogleText}>
+              {t('ContinueWithApple')}
+            </Text>
+          </TouchableOpacity>
+        )}
+
         <View style={styles.footerContainer}>
           <Text style={styles.dontHaveAccountText}>
             {isSignIn ? t('DontHaveAccount') : t('AlreadyHaveAccount')}
@@ -258,11 +349,11 @@ const styles = StyleSheet.create({
     width: '100%',
     height: hp(4.93),
     borderRadius: hp(4.93),
-    lineHeight: 0,
     paddingVertical: 0,
     fontFamily: fonts.Medium,
     fontSize: fontSize(12),
     paddingHorizontal: wp(4.92),
+    color: colors.text,
   },
   signInButtonStyle: {
     width: '100%',

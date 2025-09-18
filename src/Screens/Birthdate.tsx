@@ -14,6 +14,8 @@ import DateTimePicker, {
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { useTranslation } from 'react-i18next';
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 type Props = {
   onContinue: () => void;
@@ -54,6 +56,21 @@ export default function Birthdate({ onContinue }: Props) {
   const { language } = useSelector((state: RootState) => state.language);
 
   const { t } = useTranslation();
+
+  const onPressContinue = async () => {
+    if (birthdate) {
+      try {
+        const currentUser = auth().currentUser;
+        if (currentUser) {
+          await firestore()
+            .collection('users')
+            .doc(currentUser.uid)
+            .set({ birthdate: birthdate || null }, { merge: true });
+        }
+      } catch (e) {}
+      onContinue();
+    }
+  };
 
   return (
     <View style={styles.mainContainer}>
@@ -105,7 +122,7 @@ export default function Birthdate({ onContinue }: Props) {
 
       <LinearButton
         title={t('Continue')}
-        onPress={onContinue}
+        onPress={onPressContinue}
         style={styles.continueButton}
         textStyle={styles.continueButtonText}
       />

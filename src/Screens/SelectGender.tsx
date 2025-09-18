@@ -7,6 +7,8 @@ import { icons } from '../Constant/Icons';
 import LinearButton from '../Components/common/LinearButton';
 import { genders } from '../Constant/Constant';
 import { useTranslation } from 'react-i18next';
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 type Props = {
   onContinue: () => void;
@@ -16,6 +18,21 @@ export default function SelectGender({ onContinue }: Props) {
   const [gender, setGender] = useState('');
 
   const { t } = useTranslation();
+
+  const onPressContinue = async () => {
+    if (gender) {
+      try {
+        const currentUser = auth().currentUser;
+        if (currentUser) {
+          await firestore()
+            .collection('users')
+            .doc(currentUser.uid)
+            .set({ gender }, { merge: true });
+        }
+      } catch (e) {}
+      onContinue();
+    }
+  };
 
   return (
     <View style={styles.mainContainer}>
@@ -54,7 +71,7 @@ export default function SelectGender({ onContinue }: Props) {
 
       <LinearButton
         title={t('Continue')}
-        onPress={onContinue}
+        onPress={onPressContinue}
         style={styles.continueButton}
         textStyle={styles.continueButtonText}
       />

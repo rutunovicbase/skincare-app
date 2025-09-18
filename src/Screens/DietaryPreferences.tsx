@@ -1,13 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors } from '../Constant/Colors';
 import { wp, hp, fontSize, goBack } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
 import LinearButton from '../Components/common/LinearButton';
-import { dietaryPreferences } from '../Constant/Constant';
+import { dietaryPreferences as defaultDiet } from '../Constant/Constant';
+import {
+  fetchAndActivateConfig,
+  getLocalizedList,
+} from '../Helpers/remoteConfig';
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header } from '../Components/common/Header';
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 type Props = {
   onContinue?: () => void;
@@ -15,13 +21,25 @@ type Props = {
 
 export default function DietaryPreferences({ onContinue }: Props) {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [list, setList] = useState(defaultDiet);
   const { t } = useTranslation();
 
-  const handleOnContinue = () => {
-    if (onContinue) {
-      onContinue();
-    } else {
-      goBack();
+  const handleOnContinue = async () => {
+    if (selectedItems.length) {
+      try {
+        const currentUser = auth().currentUser;
+        if (currentUser) {
+          await firestore()
+            .collection('users')
+            .doc(currentUser.uid)
+            .set({ dietaryPreferences: selectedItems }, { merge: true });
+        }
+      } catch (e) {}
+      if (onContinue) {
+        onContinue();
+      } else {
+        goBack();
+      }
     }
   };
 
@@ -33,6 +51,17 @@ export default function DietaryPreferences({ onContinue }: Props) {
     );
   };
 
+  useEffect(() => {
+    (async () => {
+      await fetchAndActivateConfig();
+      const localized = getLocalizedList(
+        'dietaryPreferences',
+        (t as any).language || 'en',
+      );
+      setList(localized);
+    })();
+  }, []);
+
   const margin = { marginTop: !onContinue ? hp(7.38) : 0 };
 
   return (
@@ -41,7 +70,7 @@ export default function DietaryPreferences({ onContinue }: Props) {
       <View style={[styles.content, margin]}>
         <Text style={styles.title}>{t('ShareYourDietaryPreferences')}</Text>
         <Text style={styles.subTitle}>{t('TellUsAboutYourFoodHabits')}</Text>
-        {dietaryPreferences?.map(item => (
+        {list?.map(item => (
           <TouchableOpacity
             style={[
               styles.lifestyleItemContainer,

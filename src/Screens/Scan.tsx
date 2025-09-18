@@ -61,7 +61,6 @@ function Scan() {
       setCameraActive(false);
       analyzeSkin(photoPath);
     } catch (error) {
-      console.error('Error taking photo:', error);
       Alert.alert('Error', 'Failed to take photo. Please try again.');
       setCameraActive(true);
     }
@@ -97,7 +96,6 @@ function Scan() {
         }
       }
     } catch (error) {
-      console.error('Error picking from gallery:', error);
       Alert.alert(
         'Error',
         'Failed to pick image from gallery. Please try again.',
@@ -181,15 +179,18 @@ function Scan() {
           const rawText = message.content[0].text;
           try {
             analysisJson = JSON.parse(rawText);
-          } catch (e) {
-            console.error('Failed to parse analysis:', e);
-          }
+          } catch (e) {}
         }
         setIsAnalyzing(false);
         setAnalysisResult(analysisJson);
       })
 
-      .catch(error => console.error(error));
+      .catch(error => {
+        Alert.alert(
+          'Analysis Error',
+          'Failed to analyze skin. Please try again.',
+        );
+      });
   };
 
   const onPressContinue = () => {

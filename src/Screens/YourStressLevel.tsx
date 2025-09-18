@@ -1,12 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { colors } from '../Constant/Colors';
 import { wp, hp, fontSize, goBack } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
 import LinearButton from '../Components/common/LinearButton';
-import { yourStressLevel } from '../Constant/Constant';
+import { yourStressLevel as defaultStress } from '../Constant/Constant';
+import {
+  fetchAndActivateConfig,
+  getLocalizedList,
+} from '../Helpers/remoteConfig';
 import { useTranslation } from 'react-i18next';
 import { Header } from '../Components/common/Header';
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 
 type Props = {
   onContinue?: () => void;
@@ -14,15 +20,38 @@ type Props = {
 
 export default function YourStressLevel({ onContinue }: Props) {
   const [selectedItems, setSelectedItems] = useState<string>('');
+  const [list, setList] = useState(defaultStress);
   const { t } = useTranslation();
 
-  const handleOnContinue = () => {
-    if (onContinue) {
-      onContinue();
-    } else {
-      goBack();
+  const handleOnContinue = async () => {
+    if (selectedItems) {
+      try {
+        const currentUser = auth().currentUser;
+        if (currentUser) {
+          await firestore()
+            .collection('users')
+            .doc(currentUser.uid)
+            .set({ stressLevel: selectedItems || null }, { merge: true });
+        }
+      } catch (e) {}
+      if (onContinue) {
+        onContinue();
+      } else {
+        goBack();
+      }
     }
   };
+
+  useEffect(() => {
+    (async () => {
+      await fetchAndActivateConfig();
+      const localized = getLocalizedList(
+        'yourStressLevel',
+        (t as any).language || 'en',
+      );
+      setList(localized);
+    })();
+  }, []);
 
   const margin = { marginTop: !onContinue ? hp(7.38) : 0 };
 
@@ -32,7 +61,7 @@ export default function YourStressLevel({ onContinue }: Props) {
       <View style={[styles.content, margin]}>
         <Text style={styles.title}>{t('LetsUnderstandYourStressLevels')}</Text>
         <Text style={styles.subTitle}>{t('TellUsAboutYourStressLevel')}</Text>
-        {yourStressLevel?.map(item => (
+        {list?.map(item => (
           <TouchableOpacity
             style={[
               styles.lifestyleItemContainer,

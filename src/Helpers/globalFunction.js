@@ -26,3 +26,12 @@ export const commonAction = (name, params) => {
     }),
   );
 };
+
+export const resetToRoutes = routes => {
+  navigationRef.current?.dispatch(
+    CommonActions.reset({
+      index: (routes?.length || 1) - 1,
+      routes: routes,
+    }),
+  );
+};
