@@ -1,4 +1,4 @@
-package com.skincarenb
+package com.skincarenb.app
 
 import android.app.Application
 import com.facebook.react.PackageList

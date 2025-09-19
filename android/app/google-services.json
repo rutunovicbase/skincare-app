@@ -1,44 +1,27 @@
 {
   "project_info": {
-    "project_number": "902825655156",
-    "project_id": "skincare-app-eb06a",
-    "storage_bucket": "skincare-app-eb06a.firebasestorage.app"
+    "project_number": "784176063201",
+    "firebase_url": "https://skincare-5f908-default-rtdb.firebaseio.com",
+    "project_id": "skincare-5f908",
+    "storage_bucket": "skincare-5f908.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:902825655156:android:a62f01962e3851fae04a21",
+        "mobilesdk_app_id": "1:784176063201:android:d81b44a33426448836cda0",
         "android_client_info": {
-          "package_name": "com.skincarenb"
+          "package_name": "com.skincarenb.app"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "902825655156-ig5ikqau9pgkp1o9l6ad0o01725iqubp.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.skincarenb",
-            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
-          }
-        },
-        {
-          "client_id": "902825655156-alpckscj8up6gdnadrjbv4hsfaqcfmst.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBPl83FQDuRshvodEFyfVzR44VbSfzzHzU"
+          "current_key": "AIzaSyDnp0ChMms8mz5Wtw-jscuEsyqGqzoeAYA"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "902825655156-95vfml5o2vbs7f9qb5c8kd8l6qotqo9k.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

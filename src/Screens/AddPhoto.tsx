@@ -22,8 +22,8 @@ import storage from '@react-native-firebase/storage';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { Camera, useCameraDevices } from 'react-native-vision-camera';
 import { fetchUserData } from '../store/Slices/authSlice';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../store/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../store/store';
 import moment from 'moment';
 
 export default function AddPhoto() {
@@ -37,6 +37,7 @@ export default function AddPhoto() {
   const devices = useCameraDevices();
   const device = devices.find(d => d.position === 'back');
   const dispatch = useDispatch<AppDispatch>();
+  const userInfo = useSelector((state: RootState) => state.auth.user);
 
   useEffect(() => {
     (async () => {
@@ -44,6 +45,10 @@ export default function AddPhoto() {
       setCameraPermission(status);
     })();
   }, []);
+
+  useEffect(() => {
+    setPhotoUri(userInfo?.profilePhotoURL || null);
+  }, [userInfo?.profilePhotoURL]);
 
   const requestCameraAndOpen = async () => {
     if (cameraPermission !== 'authorized' && cameraPermission !== 'granted') {
@@ -81,38 +86,40 @@ export default function AddPhoto() {
   };
 
   const uploadAndContinue = async () => {
-    try {
-      const currentUser = auth().currentUser;
-      if (!currentUser) {
-        navigate('Login');
-        return;
+    if (photoUri) {
+      try {
+        const currentUser = auth().currentUser;
+        if (!currentUser) {
+          navigate('Login');
+          return;
+        }
+        let downloadURL: string | null = null;
+        if (photoUri) {
+          const fileExt = photoUri.split('.').pop() || 'jpg';
+          const path = `profilePhotos/${currentUser.uid}.${fileExt}`;
+          const ref = storage().ref(path);
+          await ref.putFile(photoUri);
+          downloadURL = await ref.getDownloadURL();
+        }
+
+        await firestore()
+          .collection('users')
+          .doc(currentUser.uid)
+          .set(
+            {
+              profilePhotoURL: downloadURL ?? null,
+              detailsCompleted: true,
+              updatedAt: moment().toISOString(),
+            },
+            { merge: true },
+          );
+
+        await dispatch(fetchUserData(currentUser.uid));
+
+        navigate('MainTabs');
+      } catch (e) {
+        navigate('MainTabs');
       }
-      let downloadURL: string | null = null;
-      if (photoUri) {
-        const fileExt = photoUri.split('.').pop() || 'jpg';
-        const path = `profilePhotos/${currentUser.uid}.${fileExt}`;
-        const ref = storage().ref(path);
-        await ref.putFile(photoUri);
-        downloadURL = await ref.getDownloadURL();
-      }
-
-      await firestore()
-        .collection('users')
-        .doc(currentUser.uid)
-        .set(
-          {
-            profilePhotoURL: downloadURL ?? null,
-            detailsCompleted: true,
-            updatedAt: moment().toISOString(),
-          },
-          { merge: true },
-        );
-
-      await dispatch(fetchUserData(currentUser.uid));
-
-      navigate('MainTabs');
-    } catch (e) {
-      navigate('MainTabs');
     }
   };
   return (

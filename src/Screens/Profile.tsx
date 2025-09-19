@@ -77,6 +77,10 @@ function Profile() {
     setRateUsModalVisible(!rateUsModalVisible);
   };
 
+  const onPressEditPhoto = () => {
+    navigate('AddPhoto');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
@@ -93,7 +97,7 @@ function Profile() {
           }
           style={styles.profilePhoto}
         />
-        <TouchableOpacity style={styles.editButton}>
+        <TouchableOpacity style={styles.editButton} onPress={onPressEditPhoto}>
           <Image source={icons.edit} style={styles.editIcon} />
         </TouchableOpacity>
       </View>
@@ -210,6 +214,7 @@ const styles = StyleSheet.create({
   profilePhoto: {
     height: hp(9.85),
     width: hp(9.85),
+    borderRadius: hp(9.85),
   },
   editButton: {
     position: 'absolute',
