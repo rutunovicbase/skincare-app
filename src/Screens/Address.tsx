@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../Constant/Colors';
 import { Header } from '../Components/common/Header';
@@ -7,8 +7,40 @@ import LinearButton from '../Components/common/LinearButton';
 import { fontSize, hp, navigate, wp } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
 import { AddressCard } from '../Components/common/AddressCard';
+import firestore from '@react-native-firebase/firestore';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
+
+type UserAddress = {
+  type: string;
+  line1: string;
+  street: string;
+  landmark?: string | null;
+  pincode: string;
+  city: string;
+  state: string;
+  receiverName: string;
+  receiverPhone: string;
+  createdAt?: string;
+};
 
 export default function Address(): React.JSX.Element {
+  const user = useSelector((s: RootState) => s.auth.user);
+  const [addresses, setAddresses] = useState<UserAddress[]>([]);
+
+  useEffect(() => {
+    if (!user?.uid) return;
+    const unsub = firestore()
+      .collection('users')
+      .doc(user.uid)
+      .onSnapshot(snap => {
+        const data = snap.data() as any;
+        const list = Array.isArray(data?.addresses) ? data.addresses : [];
+        setAddresses(list);
+      });
+    return () => unsub();
+  }, [user?.uid]);
+
   const onPressAddAddress = () => {
     navigate('AddAddress');
   };
@@ -29,13 +61,38 @@ export default function Address(): React.JSX.Element {
           <View style={styles.dividerStyle} />
         </View>
         <Text style={styles.chooseFromSaveText}>Choose From saved Address</Text>
-        <AddressCard
-          type="Home"
-          address={'D-101, abc complex, abc circle , adajan surat. 395005'}
-        />
-        <AddressCard
-          type="Office"
-          address={'D-101, abc complex, abc circle , adajan surat. 395005'}
+        <FlatList
+          data={addresses}
+          keyExtractor={(item, index) => `${item.receiverPhone}-${index}`}
+          renderItem={({ item }) => (
+            <AddressCard
+              type={item.type}
+              address={`${item.line1}, ${item.street}${
+                item.landmark ? `, ${item.landmark}` : ''
+              }, ${item.city}, ${item.state}. ${item.pincode}`}
+              onEdit={() => navigate('AddAddress', { address: item })}
+              onDelete={async () => {
+                if (!user?.uid) return;
+                try {
+                  await firestore()
+                    .collection('users')
+                    .doc(user.uid)
+                    .update({ addresses: firestore.FieldValue.arrayRemove(item as any) });
+                } catch (_) {}
+              }}
+            />
+          )}
+          ListEmptyComponent={() => (
+            <Text
+              style={{
+                flex: 1,
+                fontFamily: fonts.Medium,
+                color: colors.lightText,
+              }}
+            >
+              No saved addresses yet.
+            </Text>
+          )}
         />
       </View>
     </SafeAreaView>

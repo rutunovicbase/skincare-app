@@ -45,7 +45,6 @@ function OTPVerification({ route, navigation }: Props): React.JSX.Element {
 
       if (result?.user) {
         const user = result.user;
-        console.log('🚀 ~ handleConfirmCode ~ user:', user);
 
         await firestore()
           .collection('users')

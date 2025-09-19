@@ -81,6 +81,10 @@ function Profile() {
     navigate('AddPhoto');
   };
 
+  const onPressAddress = () => {
+    navigate('Address');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
@@ -130,6 +134,7 @@ function Profile() {
           menuName="Address"
           icon={icons.location}
           iconBackground={colors.primary}
+          onPress={onPressAddress}
         />
         <Text style={styles.sectionTitleText}>Preferences</Text>
         <Menu

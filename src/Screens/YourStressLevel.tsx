@@ -5,7 +5,6 @@ import { wp, hp, fontSize, goBack } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
 import LinearButton from '../Components/common/LinearButton';
 import { yourStressLevel as defaultStress } from '../Constant/Constant';
-// Removed screen-level fetch; lists are prefetched at app level
 import { useTranslation } from 'react-i18next';
 import { Header } from '../Components/common/Header';
 import firestore from '@react-native-firebase/firestore';
@@ -29,7 +28,7 @@ export default function YourStressLevel({ onContinue }: Props) {
     userInfo?.stressLevel || '',
   );
   const [list, setList] = useState(defaultStress);
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const handleOnContinue = async () => {
     if (selectedItems) {

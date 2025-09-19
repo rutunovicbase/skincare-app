@@ -7,19 +7,23 @@ import { fonts } from '../../Constant/Fonts';
 export function AddressCard({
   type,
   address,
+  onEdit,
+  onDelete,
 }: {
   type: string;
   address: string;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }): React.JSX.Element {
   return (
     <View style={styles.container}>
       <Text style={styles.addressTypeText}>{type}</Text>
       <Text style={styles.addressStyle}>{address}</Text>
       <View style={styles.editContainer}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={onEdit}>
           <Text style={styles.editDeleteText}>Edit</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={onDelete}>
           <Text style={styles.editDeleteText}>Delete</Text>
         </TouchableOpacity>
       </View>

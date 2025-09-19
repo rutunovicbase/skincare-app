@@ -5,7 +5,6 @@ import { wp, hp, fontSize, goBack } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
 import LinearButton from '../Components/common/LinearButton';
 import { dietaryPreferences as defaultDiet } from '../Constant/Constant';
-// Removed screen-level fetch; lists are prefetched at app level
 import { useTranslation } from 'react-i18next';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header } from '../Components/common/Header';
@@ -22,14 +21,15 @@ export default function DietaryPreferences({ onContinue }: Props) {
   const userInfo = useSelector((state: RootState) => state.auth.user);
   const language = useSelector((state: RootState) => state.language.language);
   const cachedList = useSelector(
-    (state: RootState) => state.remoteConfig.lists.dietaryPreferences?.[language],
+    (state: RootState) =>
+      state.remoteConfig.lists.dietaryPreferences?.[language],
   );
 
   const [selectedItems, setSelectedItems] = useState<string[]>(
     userInfo?.dietaryPreferences || [],
   );
   const [list, setList] = useState(defaultDiet);
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const handleOnContinue = async () => {
     if (selectedItems.length) {
