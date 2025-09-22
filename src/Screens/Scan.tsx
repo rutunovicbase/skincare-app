@@ -185,7 +185,7 @@ function Scan() {
         setAnalysisResult(analysisJson);
       })
 
-      .catch(error => {
+      .catch(() => {
         Alert.alert(
           'Analysis Error',
           'Failed to analyze skin. Please try again.',

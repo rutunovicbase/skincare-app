@@ -72,4 +72,9 @@ export const icons = {
   success: require('../../assets/Images/Success.png'),
   flip: require('../../assets/Images/flip.png'),
   receptionist: require('../../assets/Images/receptionist.png'),
+  mute: require('../../assets/Images/mute.png'),
+  unmute: require('../../assets/Images/unmute.png'),
+  call: require('../../assets/Images/call.png'),
+  videoCamera: require('../../assets/Images/videoCamera.png'),
+  videoCameraDisabled: require('../../assets/Images/videoCameraDisabled.png'),
 };

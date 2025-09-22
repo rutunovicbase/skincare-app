@@ -1,14 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../Constant/Colors';
 import { icons } from '../Constant/Icons';
-import { fontSize, hp, wp } from '../Helpers/globalFunction';
+import { fontSize, hp, wp, navigate } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
 import LinearButton from '../Components/common/LinearButton';
+import { UserRole } from '../Constant/AgoraConfig';
 
 export default function LiveReview(): React.JSX.Element {
-  const onPressCallNow = () => {};
+  const [isCalling, setIsCalling] = useState(false);
+
+  const onPressCallNow = () => {
+    setIsCalling(true);
+    navigate('VideoCall', {
+      userRole: UserRole.CLIENT,
+      channelName: `skincare-consultation-${Date.now()}`,
+    });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Image source={icons.receptionist} style={styles.imageStyle} />
@@ -30,10 +40,14 @@ export default function LiveReview(): React.JSX.Element {
       </View>
       <View style={styles.footerContainer}>
         <LinearButton
-          title="Call Now"
-          style={styles.callNowButton}
+          title={isCalling ? 'Connecting...' : 'Call Now'}
+          style={[
+            styles.callNowButton,
+            isCalling && styles.callNowButtonDisabled,
+          ]}
           textStyle={styles.callNowButtonText}
           onPress={onPressCallNow}
+          disabled={isCalling}
         />
       </View>
     </SafeAreaView>
@@ -92,6 +106,10 @@ const styles = StyleSheet.create({
     paddingVertical: hp(1.29),
     borderRadius: wp(100),
     marginBottom: hp(1.23),
+  },
+  callNowButtonDisabled: {
+    backgroundColor: colors.textRGBA,
+    opacity: 0.6,
   },
   callNowButtonText: {
     textAlign: 'center',
