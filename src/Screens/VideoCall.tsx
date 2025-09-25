@@ -17,6 +17,7 @@ import {
   IRtcEngineEventHandler,
   IRtcEngine,
   RtcSurfaceView,
+  VideoSourceType,
 } from 'react-native-agora';
 import { colors } from '../Constant/Colors';
 import { fonts } from '../Constant/Fonts';
@@ -29,6 +30,7 @@ interface VideoCallProps {
     params?: {
       userRole?: UserRole;
       channelName?: string;
+      rtcToken?: string;
     };
   };
 }
@@ -42,13 +44,19 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
 
   const engineRef = useRef<IRtcEngine | null>(null);
   const userRole = route?.params?.userRole || UserRole.CLIENT;
-  const channelName = route?.params?.channelName || AGORA_CONFIG.CHANNEL_NAME;
+  const { channelName, rtcToken } = route?.params || {};
 
   useEffect(() => {
     initializeAgora();
     return () => {
       cleanup();
     };
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      await joinChannel(rtcToken ?? '');
+    })();
   }, []);
 
   const initializeAgora = async () => {
@@ -65,17 +73,17 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
 
       setupEventHandlers(engine);
 
+      engine.enableLocalAudio(true);
+      engine.enableLocalVideo(true);
       engine.enableVideo();
-      engine.startPreview();
       engine.enableAudio();
+      engine.startPreview(VideoSourceType.VideoSourceCameraPrimary);
 
       const role =
         userRole === UserRole.ADMIN
           ? ClientRoleType.ClientRoleBroadcaster
           : ClientRoleType.ClientRoleBroadcaster;
       engine.setClientRole(role);
-
-      await generateToken();
     } catch (error) {
       console.error('Failed to initialize Agora:', error);
       setCallState(CallState.ERROR);
@@ -89,15 +97,13 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
   const setupEventHandlers = (engine: IRtcEngine) => {
     const eventHandlers: IRtcEngineEventHandler = {
       onJoinChannelSuccess: connection => {
-        console.log('Joined channel successfully:', connection);
         setCallState(CallState.CONNECTED);
+        setLocalUid(connection?.localUid ?? 0);
       },
       onUserJoined: (connection, remoteUid) => {
-        console.log('User joined:', remoteUid);
         setRemoteUsers(prev => [...prev, remoteUid]);
       },
       onUserOffline: (connection, remoteUid) => {
-        console.log('User offline:', remoteUid);
         setRemoteUsers(prev => prev.filter(id => id !== remoteUid));
       },
       onError: (err: number, msg: string) => {
@@ -105,7 +111,6 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
         setCallState(CallState.ERROR);
       },
       onLeaveChannel: () => {
-        console.log('Left channel');
         setCallState(CallState.DISCONNECTED);
         setRemoteUsers([]);
       },
@@ -114,46 +119,12 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
     engine.registerEventHandler(eventHandlers);
   };
 
-  const generateToken = async () => {
-    try {
-      const response = await fetch(AGORA_CONFIG.TOKEN_SERVER_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          channelName,
-          uid: 0,
-          role: 'publisher',
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to generate token');
-      }
-
-      const json = await response.json();
-      const serverToken = json?.data?.token || json?.token;
-      if (!serverToken) throw new Error('Token not found in response');
-
-      setLocalUid(0);
-      await joinChannel(serverToken);
-    } catch (error) {
-      console.error('Token generation failed:', error);
-      Alert.alert('Error', 'Failed to generate call token. Please try again.');
-      setCallState(CallState.ERROR);
-    }
-  };
-
   const joinChannel = async (token: string) => {
     if (!engineRef.current) return;
 
     try {
-      engineRef.current.joinChannel(token, channelName, localUid, {
-        clientRoleType:
-          userRole === UserRole.ADMIN
-            ? ClientRoleType.ClientRoleBroadcaster
-            : ClientRoleType.ClientRoleBroadcaster,
+      engineRef.current.joinChannel(token, channelName ?? '', 0, {
+        clientRoleType: ClientRoleType.ClientRoleBroadcaster,
       });
     } catch (error) {
       console.error('Failed to join channel:', error);
@@ -174,7 +145,6 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
 
   const toggleMute = async () => {
     if (!engineRef.current) return;
-
     try {
       engineRef.current.muteLocalAudioStream(!isMuted);
       setIsMuted(!isMuted);
@@ -185,7 +155,6 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
 
   const toggleVideo = async () => {
     if (!engineRef.current) return;
-
     try {
       engineRef.current.muteLocalVideoStream(!isVideoEnabled);
       setIsVideoEnabled(!isVideoEnabled);
@@ -222,23 +191,35 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
         );
 
       case CallState.CONNECTED:
+        const remoteUid = remoteUsers.find(uid => uid !== localUid);
         return (
           <View style={styles.callContainer}>
             <View style={styles.videoContainer}>
-              <View style={styles.localVideoView}>
-                <RtcSurfaceView
-                  canvas={{ uid: 0 }}
-                  style={styles.rctViewStyle}
-                />
-              </View>
+              {remoteUid ? (
+                <View style={styles.remoteVideoWrapper}>
+                  <RtcSurfaceView
+                    key={remoteUid}
+                    canvas={{ uid: remoteUid }}
+                    style={styles.fullScreenVideoView}
+                  />
+                </View>
+              ) : (
+                <View style={styles.fullScreenPlaceholder}>
+                  <Text style={{ color: colors.text }}>
+                    Waiting for remote user...
+                  </Text>
+                </View>
+              )}
 
-              {remoteUsers.map(uid => (
-                <RtcSurfaceView
-                  key={uid}
-                  canvas={{ uid }}
-                  style={styles.remoteVideoView}
-                />
-              ))}
+              {localUid !== 0 && (
+                <View style={styles.localFloatingVideoWrapper}>
+                  <RtcSurfaceView
+                    canvas={{ uid: 0 }}
+                    style={styles.localFloatingVideo}
+                    zOrderOnTop
+                  />
+                </View>
+              )}
             </View>
 
             <View style={styles.controlsContainer}>
@@ -246,25 +227,24 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
                 style={[styles.controlButton]}
                 onPress={toggleMute}
               >
-                {isMuted ? (
-                  <Image source={icons.mute} style={styles.iconsStyle} />
-                ) : (
-                  <Image source={icons.unmute} style={styles.iconsStyle} />
-                )}
+                <Image
+                  source={isMuted ? icons.mute : icons.unmute}
+                  style={styles.iconsStyle}
+                />
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={[styles.controlButton]}
                 onPress={toggleVideo}
               >
-                {isVideoEnabled ? (
-                  <Image
-                    source={icons.videoCameraDisabled}
-                    style={styles.iconsStyle}
-                  />
-                ) : (
-                  <Image source={icons.videoCamera} style={styles.iconsStyle} />
-                )}
+                <Image
+                  source={
+                    isVideoEnabled
+                      ? icons.videoCameraDisabled
+                      : icons.videoCamera
+                  }
+                  style={styles.iconsStyle}
+                />
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -330,11 +310,6 @@ const styles = StyleSheet.create({
     width: wp(8),
     tintColor: colors.text,
   },
-  backButtonText: {
-    color: colors.background,
-    fontSize: fontSize(16),
-    fontFamily: fonts.Medium,
-  },
   headerSpacer: {
     width: wp(12),
   },
@@ -355,32 +330,44 @@ const styles = StyleSheet.create({
   videoContainer: {
     flex: 1,
     backgroundColor: colors.black,
+    position: 'relative',
   },
-  localVideoView: {
+  fullScreenVideoView: {
+    flex: 1,
+    backgroundColor: colors.black,
+  },
+  remoteVideoWrapper: {
+    flex: 1,
+    position: 'relative',
+  },
+  fullScreenPlaceholder: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.black,
+  },
+  localFloatingVideoWrapper: {
     position: 'absolute',
     top: hp(2),
     right: wp(4),
     width: wp(30),
     height: hp(20),
-    backgroundColor: colors.textRGBA,
     borderRadius: wp(2),
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  remoteVideoView: {
-    flex: 1,
+    overflow: 'hidden',
     backgroundColor: colors.textRGBA,
-    justifyContent: 'center',
-    alignItems: 'center',
+    zIndex: 99,
+    borderWidth: 2,
+    borderColor: colors.background,
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
+    elevation: 5,
   },
-  rctViewStyle: {
+  localFloatingVideo: {
     width: '100%',
+    zIndex: 999,
     height: '100%',
-  },
-  videoLabel: {
-    color: colors.background,
-    fontSize: fontSize(14),
-    fontFamily: fonts.Medium,
   },
   controlsContainer: {
     flexDirection: 'row',
@@ -392,6 +379,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     bottom: 0,
+    zIndex: 100, // Ensure controls are above the floating video
   },
   controlButton: {
     width: wp(13.33),
@@ -404,6 +392,7 @@ const styles = StyleSheet.create({
   iconsStyle: {
     height: wp(6.4),
     width: wp(6.4),
+    tintColor: colors.white, // Ensure icons are visible
   },
   endCallButton: {
     backgroundColor: colors.cancelRed,

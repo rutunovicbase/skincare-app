@@ -6,17 +6,81 @@ import { icons } from '../Constant/Icons';
 import { fontSize, hp, wp, navigate } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
 import LinearButton from '../Components/common/LinearButton';
-import { UserRole } from '../Constant/AgoraConfig';
+import { AGORA_CONFIG, UserRole } from '../Constant/AgoraConfig';
+import firestore from '@react-native-firebase/firestore';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
+import moment from 'moment';
 
 export default function LiveReview(): React.JSX.Element {
   const [isCalling, setIsCalling] = useState(false);
+  const userInfo = useSelector((state: RootState) => state.auth.user);
 
-  const onPressCallNow = () => {
-    setIsCalling(true);
-    navigate('VideoCall', {
-      userRole: UserRole.CLIENT,
-      channelName: `skincare-consultation-${Date.now()}`,
+  const getAgoraToken = async (channelName: string, uid: string) => {
+    const res = await fetch(AGORA_CONFIG.TOKEN_SERVER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        channelName,
+        uid,
+        role: 'publisher',
+        expireSeconds: 3600,
+      }),
     });
+
+    const json = await res.json();
+    const token = json?.data?.token || json?.token;
+    const expireAt = json?.data?.expireAt || null;
+    if (!token) throw new Error('Token not found');
+
+    return { token, expireAt };
+  };
+
+  const onPressCallNow = async () => {
+    if (!userInfo?.uid) return;
+
+    try {
+      setIsCalling(true);
+
+      let aiConsultationReport: any = null;
+      try {
+        const reviewsRef = firestore()
+          .collection('users')
+          .doc(userInfo.uid)
+          .collection('reviews');
+        const latest = await reviewsRef
+          .orderBy('createdAt', 'desc')
+          .limit(1)
+          .get();
+        if (!latest.empty) {
+          aiConsultationReport = latest.docs[0].data()?.aiConsultation ?? null;
+        }
+      } catch (e) {}
+
+      const channelName = `consultation-${Date.now()}-${userInfo.uid}`;
+      const { token } = await getAgoraToken(channelName, String(userInfo.uid));
+
+      await firestore()
+        .collection('videoCallSessions')
+        .add({
+          patientId: userInfo.uid,
+          patientName: userInfo?.displayName || userInfo?.firstName || '',
+          channelName,
+          status: 'waiting',
+          createdAt: moment().toISOString(),
+          aiConsultationReport: aiConsultationReport ?? null,
+          patientToken: token,
+          tokenRole: 'publisher',
+        });
+
+      navigate('VideoCall', {
+        userRole: UserRole.CLIENT,
+        channelName,
+        rtcToken: token,
+      });
+    } catch (e) {
+      setIsCalling(false);
+    }
   };
 
   return (

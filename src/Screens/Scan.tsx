@@ -24,6 +24,10 @@ import { hp, wp, fontSize, goBack, navigate } from '../Helpers/globalFunction';
 import RNFS from 'react-native-fs';
 import LinearButton from '../Components/common/LinearButton';
 import { OPEN_AI_KEY } from '@env';
+import firestore from '@react-native-firebase/firestore';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
+import moment from 'moment';
 
 interface SkinAnalysisResult {
   problem: string;
@@ -43,6 +47,7 @@ function Scan() {
   const cameraRef = useRef<Camera>(null);
   const device = useCameraDevice(activeCamera);
   const { hasPermission, requestPermission } = useCameraPermission();
+  const userInfo = useSelector((state: RootState) => state.auth.user);
 
   const takePhoto = async () => {
     if (!cameraRef.current) return;
@@ -193,8 +198,17 @@ function Scan() {
       });
   };
 
-  const onPressContinue = () => {
-    navigate('LiveReview');
+  const onPressContinue = async (uid: string) => {
+    try {
+      await firestore().collection('users').doc(uid).collection('reviews').add({
+        aiConsultation: analysisResult,
+        createdAt: moment().toISOString(),
+      });
+
+      navigate('LiveReview');
+    } catch (error) {
+      console.error('Error saving aiConsultation: ', error);
+    }
   };
 
   const retakePhoto = () => {
@@ -382,7 +396,13 @@ function Scan() {
                     title="Take consult"
                     style={styles.consultButton}
                     textStyle={styles.continueButtonText}
-                    onPress={onPressContinue}
+                    onPress={() => {
+                      if (userInfo?.uid) {
+                        onPressContinue(userInfo.uid);
+                      } else {
+                        Alert.alert('Error', 'User ID not found.');
+                      }
+                    }}
                   />
                 </View>
               </View>

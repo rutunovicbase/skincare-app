@@ -97,7 +97,12 @@ function Login(): React.JSX.Element {
   useEffect(() => {
     const redirectAfterAuth = async () => {
       if (!isAuthenticated || !authUser?.uid) return;
-      await navigateAfterAuth(dispatch as any, navigation as any, authUser.uid, isNewUser);
+      await navigateAfterAuth(
+        dispatch as any,
+        navigation as any,
+        authUser.uid,
+        isNewUser,
+      );
     };
 
     redirectAfterAuth();
