@@ -60,23 +60,27 @@ export default function LiveReview(): React.JSX.Element {
       const channelName = `consultation-${Date.now()}-${userInfo.uid}`;
       const { token } = await getAgoraToken(channelName, String(userInfo.uid));
 
-      await firestore()
+      const sessionRef = await firestore()
         .collection('videoCallSessions')
         .add({
           patientId: userInfo.uid,
           patientName: userInfo?.displayName || userInfo?.firstName || '',
           channelName,
-          status: 'waiting',
+          status: 'CONNECTING',
           createdAt: moment().toISOString(),
           aiConsultationReport: aiConsultationReport ?? null,
           patientToken: token,
           tokenRole: 'publisher',
+          receptionistJoined: false,
         });
+      const sessionId = sessionRef.id;
+      await sessionRef.update({ sessionId });
 
       navigate('VideoCall', {
         userRole: UserRole.CLIENT,
         channelName,
         rtcToken: token,
+        sessionId,
       });
     } catch (e) {
       setIsCalling(false);

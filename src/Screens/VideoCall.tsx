@@ -23,6 +23,7 @@ import { colors } from '../Constant/Colors';
 import { fonts } from '../Constant/Fonts';
 import { fontSize, hp, wp, goBack } from '../Helpers/globalFunction';
 import { AGORA_CONFIG, CallState, UserRole } from '../Constant/AgoraConfig';
+import firestore from '@react-native-firebase/firestore';
 import { icons } from '../Constant/Icons';
 
 interface VideoCallProps {
@@ -31,12 +32,13 @@ interface VideoCallProps {
       userRole?: UserRole;
       channelName?: string;
       rtcToken?: string;
+      sessionId?: string;
     };
   };
 }
 
 const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
-  const [callState, setCallState] = useState<CallState>(CallState.IDLE);
+  const [callState, setCallState] = useState<CallState | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
   const [remoteUsers, setRemoteUsers] = useState<number[]>([]);
@@ -44,7 +46,10 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
 
   const engineRef = useRef<IRtcEngine | null>(null);
   const userRole = route?.params?.userRole || UserRole.CLIENT;
-  const { channelName, rtcToken } = route?.params || {};
+  const { channelName, rtcToken, sessionId } = route?.params || {};
+  const sessionDocRef = sessionId
+    ? firestore().collection('videoCallSessions').doc(sessionId)
+    : null;
 
   useEffect(() => {
     initializeAgora();
@@ -53,17 +58,15 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
     };
   }, []);
 
-  useEffect(() => {
-    (async () => {
-      await joinChannel(rtcToken ?? '');
-    })();
-  }, []);
-
   const initializeAgora = async () => {
     try {
-      setCallState(CallState.JOINING);
+      setCallState(CallState.CONNECTING);
+      if (sessionDocRef) {
+        await sessionDocRef.update({ status: 'CONNECTING' }).catch(() => {});
+      }
 
       const engine = createAgoraRtcEngine();
+      console.log('🚀 ~ initializeAgora ~ engine:', engine);
       engineRef.current = engine;
 
       engine.initialize({
@@ -84,6 +87,9 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
           ? ClientRoleType.ClientRoleBroadcaster
           : ClientRoleType.ClientRoleBroadcaster;
       engine.setClientRole(role);
+
+      // Join the channel only after the engine is fully initialized
+      await joinChannel(rtcToken ?? '');
     } catch (error) {
       console.error('Failed to initialize Agora:', error);
       setCallState(CallState.ERROR);
@@ -95,8 +101,10 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
   };
 
   const setupEventHandlers = (engine: IRtcEngine) => {
+    console.log('Engin', engine);
     const eventHandlers: IRtcEngineEventHandler = {
-      onJoinChannelSuccess: connection => {
+      onJoinChannelSuccess: async connection => {
+        console.log('🚀 ~ setupEventHandlers ~ connection:', connection);
         setCallState(CallState.CONNECTED);
         setLocalUid(connection?.localUid ?? 0);
       },
@@ -108,11 +116,18 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
       },
       onError: (err: number, msg: string) => {
         console.log('Agora error:', err, msg);
-        setCallState(CallState.ERROR);
+        setCallState(CallState.DISCONNECTED);
+        if (sessionDocRef)
+          sessionDocRef.update({ status: 'DISCONNECTED' }).catch(() => {});
       },
-      onLeaveChannel: () => {
+      onLeaveChannel: async () => {
         setCallState(CallState.DISCONNECTED);
         setRemoteUsers([]);
+        if (sessionDocRef) {
+          await sessionDocRef
+            .update({ status: 'DISCONNECTED' })
+            .catch(() => {});
+        }
       },
     };
 
@@ -128,7 +143,7 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
       });
     } catch (error) {
       console.error('Failed to join channel:', error);
-      setCallState(CallState.ERROR);
+      setCallState(CallState.DISCONNECTED);
     }
   };
 
@@ -138,6 +153,11 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
     try {
       engineRef.current.leaveChannel();
       setCallState(CallState.DISCONNECTED);
+      if (sessionDocRef) {
+        await sessionDocRef
+          .update({ status: CallState.DISCONNECTED })
+          .catch(() => {});
+      }
     } catch (error) {
       console.error('Failed to leave channel:', error);
     }
@@ -182,7 +202,7 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
 
   const renderCallContent = () => {
     switch (callState) {
-      case CallState.JOINING:
+      case CallState.CONNECTING:
         return (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={colors.primary} />
@@ -392,7 +412,7 @@ const styles = StyleSheet.create({
   iconsStyle: {
     height: wp(6.4),
     width: wp(6.4),
-    tintColor: colors.white, // Ensure icons are visible
+    tintColor: colors.background, // Ensure icons are visible
   },
   endCallButton: {
     backgroundColor: colors.cancelRed,

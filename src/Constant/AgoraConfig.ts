@@ -6,13 +6,14 @@ export const AGORA_CONFIG = {
     'https://us-central1-skincare-5f908.cloudfunctions.net/agoraTokenGenerator',
 };
 
-// Call states
+// Call states (aligned with Agora)
 export enum CallState {
-  IDLE = 'idle',
-  JOINING = 'joining',
-  CONNECTED = 'connected',
-  DISCONNECTED = 'disconnected',
-  ERROR = 'error',
+  CONNECTING = 'CONNECTING',
+  CONNECTED = 'CONNECTED',
+  RECONNECTING = 'RECONNECTING',
+  DISCONNECTING = 'DISCONNECTING',
+  DISCONNECTED = 'DISCONNECTED',
+  ERROR = 'ERROR',
 }
 
 // User roles
