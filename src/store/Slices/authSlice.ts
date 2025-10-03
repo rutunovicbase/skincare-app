@@ -51,7 +51,6 @@ export const signInWithGoogleIdToken = createAsyncThunk(
   async (idToken: string, { rejectWithValue }) => {
     try {
       const googleCredential = GoogleAuthProvider.credential(idToken);
-      console.log('🚀 ~ googleCredential:', googleCredential);
 
       const result = await auth().signInWithCredential(googleCredential);
       const firebaseUser = result.user;

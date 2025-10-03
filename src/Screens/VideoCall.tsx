@@ -66,7 +66,6 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
       }
 
       const engine = createAgoraRtcEngine();
-      console.log('🚀 ~ initializeAgora ~ engine:', engine);
       engineRef.current = engine;
 
       engine.initialize({
@@ -101,10 +100,8 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
   };
 
   const setupEventHandlers = (engine: IRtcEngine) => {
-    console.log('Engin', engine);
     const eventHandlers: IRtcEngineEventHandler = {
       onJoinChannelSuccess: async connection => {
-        console.log('🚀 ~ setupEventHandlers ~ connection:', connection);
         setCallState(CallState.CONNECTED);
         setLocalUid(connection?.localUid ?? 0);
       },
@@ -113,9 +110,10 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
       },
       onUserOffline: (connection, remoteUid) => {
         setRemoteUsers(prev => prev.filter(id => id !== remoteUid));
+        leaveChannel();
+        goBack();
       },
-      onError: (err: number, msg: string) => {
-        console.log('Agora error:', err, msg);
+      onError: () => {
         setCallState(CallState.DISCONNECTED);
         if (sessionDocRef)
           sessionDocRef.update({ status: 'DISCONNECTED' }).catch(() => {});
