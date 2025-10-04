@@ -31,7 +31,7 @@ export type Consultation = {
   date: string;
   rating: number;
   isComplete?: boolean;
-  avatar: ImageSourcePropType;
+  profilePhotoURL: ImageSourcePropType;
   isCancelled?: boolean;
 };
 

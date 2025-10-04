@@ -110,6 +110,7 @@ export default function AddPhoto() {
               profilePhotoURL: downloadURL ?? null,
               detailsCompleted: true,
               updatedAt: moment().toISOString(),
+              role: 'Patient',
             },
             { merge: true },
           );

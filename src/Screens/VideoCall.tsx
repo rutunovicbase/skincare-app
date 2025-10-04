@@ -47,6 +47,8 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
   const engineRef = useRef<IRtcEngine | null>(null);
   const userRole = route?.params?.userRole || UserRole.CLIENT;
   const { channelName, rtcToken, sessionId } = route?.params || {};
+  console.log('🚀 ~ VideoCall ~ channelName:1', channelName);
+
   const sessionDocRef = sessionId
     ? firestore().collection('videoCallSessions').doc(sessionId)
     : null;
@@ -61,6 +63,7 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
   const initializeAgora = async () => {
     try {
       setCallState(CallState.CONNECTING);
+      console.log('🚀 ~ initializeAgora ~ sessionDocRef:', sessionDocRef);
       if (sessionDocRef) {
         await sessionDocRef.update({ status: 'CONNECTING' }).catch(() => {});
       }
@@ -102,18 +105,22 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
   const setupEventHandlers = (engine: IRtcEngine) => {
     const eventHandlers: IRtcEngineEventHandler = {
       onJoinChannelSuccess: async connection => {
+        console.log('🚀 ~ setupEventHandlers ~ connection:', connection);
         setCallState(CallState.CONNECTED);
         setLocalUid(connection?.localUid ?? 0);
       },
       onUserJoined: (connection, remoteUid) => {
+        console.log('User joined:', remoteUid);
         setRemoteUsers(prev => [...prev, remoteUid]);
       },
       onUserOffline: (connection, remoteUid) => {
+        console.log('🚀 ~ setupEventHandlers ~ remoteUid:', remoteUid);
         setRemoteUsers(prev => prev.filter(id => id !== remoteUid));
         leaveChannel();
         goBack();
       },
       onError: () => {
+        console.log('ERR');
         setCallState(CallState.DISCONNECTED);
         if (sessionDocRef)
           sessionDocRef.update({ status: 'DISCONNECTED' }).catch(() => {});
@@ -136,6 +143,7 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
     if (!engineRef.current) return;
 
     try {
+      console.log('🚀 ~ joinChannel ~ channelName:', channelName);
       engineRef.current.joinChannel(token, channelName ?? '', 0, {
         clientRoleType: ClientRoleType.ClientRoleBroadcaster,
       });

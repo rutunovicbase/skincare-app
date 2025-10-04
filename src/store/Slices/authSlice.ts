@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import auth, { GoogleAuthProvider } from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+import messaging from '@react-native-firebase/messaging';
 import moment from 'moment';
 import { serializeDate } from '../../Helpers/globalFunction';
 
@@ -22,6 +23,7 @@ export type AuthUser = {
   stressLevel?: string | null;
   dietaryPreferences?: string[] | null;
   lifestyle?: string | null;
+  fcmToken?: string | null;
 };
 
 type AuthState = {
@@ -54,6 +56,7 @@ export const signInWithGoogleIdToken = createAsyncThunk(
 
       const result = await auth().signInWithCredential(googleCredential);
       const firebaseUser = result.user;
+      const fcmToken = await messaging().getToken();
 
       const userDocRef = firestore().collection('users').doc(firebaseUser.uid);
 
@@ -62,6 +65,7 @@ export const signInWithGoogleIdToken = createAsyncThunk(
           uid: firebaseUser.uid,
           email: firebaseUser.email ?? null,
           providerId: 'google.com',
+          fcmToken,
         },
         { merge: true },
       );
@@ -79,6 +83,7 @@ export const signInWithGoogleIdToken = createAsyncThunk(
         email: firebaseUser.email ?? null,
         emailVerified: !!firebaseUser.emailVerified,
         providerId: 'google.com',
+        fcmToken,
       };
 
       return {
@@ -132,6 +137,7 @@ export const fetchUserData = createAsyncThunk(
         stressLevel: userData?.stressLevel || null,
         dietaryPreferences: userData?.dietaryPreferences || null,
         lifestyle: userData?.lifestyle || null,
+        fcmToken: userData?.fcmToken || null,
       };
 
       return mappedUser;

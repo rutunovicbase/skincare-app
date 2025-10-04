@@ -23,7 +23,7 @@ const consultations: Consultation[] = [
     date: 'Tue, 14 Aug 10:00 A.M.',
     rating: 4.5,
     isComplete: false,
-    avatar: icons.dummyDoctor,
+    profilePhotoURL: icons.dummyDoctor,
     isCancelled: false,
   },
   {
@@ -34,7 +34,7 @@ const consultations: Consultation[] = [
     date: 'Tue, 14 Aug 10:00 A.M.',
     rating: 4.5,
     isComplete: false,
-    avatar: icons.dummyDoctor,
+    profilePhotoURL: icons.dummyDoctor,
     isCancelled: true,
   },
   {
@@ -45,7 +45,7 @@ const consultations: Consultation[] = [
     Concern: ['Pimples', 'Dark circles'],
     rating: 4.5,
     isComplete: true,
-    avatar: icons.dummyDoctor,
+    profilePhotoURL: icons.dummyDoctor,
     isCancelled: false,
   },
 ];
@@ -95,7 +95,7 @@ export default function ConsultHistory() {
         </Text>
         <View style={styles.cardContainerView}>
           <View style={styles.cardLeftView}>
-            <Image source={item.avatar} style={styles.doctorAvatar} />
+            <Image source={item.profilePhotoURL} style={styles.doctorAvatar} />
             <View style={styles.doctorDetails}>
               <Text style={styles.doctorNameText}>{item.doctor}</Text>
               <Text style={styles.doctorSpecializationText}>

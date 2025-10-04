@@ -5,11 +5,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import languageReducer from './Slices/languageSlice';
 import authReducer from './Slices/authSlice';
 import remoteConfigReducer from './Slices/remoteConfigSlice';
+import notificationReducer from './Slices/notificationSlice';
 
 const rootReducer = combineReducers({
   language: languageReducer,
   auth: authReducer,
   remoteConfig: remoteConfigReducer,
+  notification: notificationReducer,
 });
 
 const persistConfig = {

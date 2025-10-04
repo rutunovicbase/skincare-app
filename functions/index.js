@@ -1,4 +1,9 @@
 const functions = require('firebase-functions/v1');
+const admin = require('firebase-admin');
+const serviceAccount = require('./serviceAccountKey.json');
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 const { RtcTokenBuilder, RtcRole } = require('agora-token');
 require('dotenv').config();
 const cors = require('cors')({ origin: true });
@@ -39,6 +44,36 @@ const agoraTokenGenerator = functions.https.onRequest(async (req, res) => {
   });
 });
 
-module.exports = { agoraTokenGenerator };
+const sendPushNotification = functions.https.onRequest(async (req, res) => {
+  cors(req, res, async () => {
+    try {
+      const { title, body, type, fcmToken, data } = req.body;
+      if (!title || !body || !type || !fcmToken) {
+        return res.status(400).json({
+          success: false,
+          message: 'Missing required fields',
+        });
+      }
+      const message = {
+        token: fcmToken,
+        notification: { title, body },
+        data: data ? data : {},
+      };
+
+      await admin.messaging().send(message);
+      return res.status(200).json({
+        success: true,
+        message: 'Push sent successfully',
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: 'Something went wrong',
+      });
+    }
+  });
+});
+
+module.exports = { agoraTokenGenerator, sendPushNotification };
 
 // https://us-central1-skincare-5f908.cloudfunctions.net/agoraTokenGenerator

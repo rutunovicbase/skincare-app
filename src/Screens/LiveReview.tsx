@@ -72,7 +72,7 @@ export default function LiveReview(): React.JSX.Element {
           patientToken: token,
           tokenRole: 'publisher',
           receptionistJoined: false,
-          avatar: userInfo?.profilePhotoURL,
+          profilePhotoURL: userInfo?.profilePhotoURL,
         });
       const sessionId = sessionRef.id;
       await sessionRef.update({ sessionId });

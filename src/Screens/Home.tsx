@@ -15,6 +15,8 @@ import { fontSize, hp, navigate, wp } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
 import { icons } from '../Constant/Icons';
 import { FlatList } from 'react-native-gesture-handler';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
 
 const data = [
   {
@@ -47,6 +49,7 @@ function Home() {
   const onPressSubscriptionBanner = () => {
     navigate('Subscription');
   };
+
   return (
     <>
       <StatusBar

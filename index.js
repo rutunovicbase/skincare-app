@@ -8,6 +8,9 @@ import { name as appName } from './app.json';
 import { persistor, store } from './src/store/store';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
+import { getPushNotification } from './src/Helpers/pushNotification';
+
+getPushNotification();
 
 const Root = () => (
   <Provider store={store}>

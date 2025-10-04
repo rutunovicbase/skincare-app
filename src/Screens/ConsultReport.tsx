@@ -47,7 +47,7 @@ export default function ConsultReport(): React.JSX.Element {
           source={icons.checksGradient}
         >
           <View style={styles.doctorDetailsView}>
-            <Image style={styles.doctorImage} source={item.avatar} />
+            <Image style={styles.doctorImage} source={item.profilePhotoURL} />
             <View style={styles.doctorNameContainer}>
               <Text style={styles.doctorName}>{item?.doctor}</Text>
               <Text style={styles.doctorPositionName}>
