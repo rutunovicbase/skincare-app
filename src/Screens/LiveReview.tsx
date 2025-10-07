@@ -42,21 +42,6 @@ export default function LiveReview(): React.JSX.Element {
     try {
       setIsCalling(true);
 
-      let aiConsultationReport: any = null;
-      try {
-        const reviewsRef = firestore()
-          .collection('users')
-          .doc(userInfo.uid)
-          .collection('reviews');
-        const latest = await reviewsRef
-          .orderBy('createdAt', 'desc')
-          .limit(1)
-          .get();
-        if (!latest.empty) {
-          aiConsultationReport = latest.docs[0].data()?.aiConsultation ?? null;
-        }
-      } catch (e) {}
-
       const channelName = `consultation-${Date.now()}-${userInfo.uid}`;
       const { token } = await getAgoraToken(channelName, String(userInfo.uid));
 
@@ -68,7 +53,6 @@ export default function LiveReview(): React.JSX.Element {
           channelName,
           status: 'CONNECTING',
           createdAt: moment().toISOString(),
-          aiConsultationReport: aiConsultationReport ?? null,
           patientToken: token,
           tokenRole: 'publisher',
           receptionistJoined: false,

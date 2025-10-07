@@ -200,10 +200,31 @@ function Scan() {
 
   const onPressContinue = async (uid: string) => {
     try {
-      await firestore().collection('users').doc(uid).collection('reviews').add({
-        aiConsultation: analysisResult,
-        createdAt: moment().toISOString(),
-      });
+      const aiConsultationRef = firestore().collection('aiConsultation');
+
+      const querySnapshot = await aiConsultationRef
+        .where('userId', '==', uid)
+        .get();
+
+      if (!querySnapshot.empty) {
+        const docRef = querySnapshot.docs[0].ref; // Assuming one doc per userId
+        await docRef.update({
+          review: firestore.FieldValue.arrayUnion({
+            aiConsultation: analysisResult,
+            createdAt: moment().toISOString(),
+          }),
+        });
+      } else {
+        await aiConsultationRef.add({
+          userId: uid,
+          review: [
+            {
+              aiConsultation: analysisResult,
+              createdAt: moment().toISOString(),
+            },
+          ],
+        });
+      }
 
       navigate('LiveReview');
     } catch (error) {
