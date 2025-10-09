@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   FlatList,
   Image,
@@ -13,112 +13,122 @@ import { colors } from '../Constant/Colors';
 import { fonts } from '../Constant/Fonts';
 import { Consultation } from '../Constant/types';
 import { CancelConsultationModal } from '../Components/ModalComponent/CancelConsultationModal';
-
-const consultations: Consultation[] = [
-  {
-    id: '1',
-    doctor: 'Dr Naira jaswal',
-    specialization: 'Snr. Dermatologist (MD,OD)',
-    Concern: ['Pimples', 'Acne', 'Pigmentation', 'Acne', 'Dark circles'],
-    date: 'Tue, 14 Aug 10:00 A.M.',
-    rating: 4.5,
-    isComplete: false,
-    profilePhotoURL: icons.dummyDoctor,
-    isCancelled: false,
-  },
-  {
-    id: '2',
-    doctor: 'Dr Naira jaswal',
-    specialization: 'Snr. Dermatologist (MD,OD)',
-    Concern: ['Pigmentation', 'Pimples'],
-    date: 'Tue, 14 Aug 10:00 A.M.',
-    rating: 4.5,
-    isComplete: false,
-    profilePhotoURL: icons.dummyDoctor,
-    isCancelled: true,
-  },
-  {
-    id: '3',
-    doctor: 'Dr Naira jaswal',
-    specialization: 'Snr. Dermatologist (MD,OD)',
-    date: 'Tue, 14 Aug 10:00 A.M.',
-    Concern: ['Pimples', 'Dark circles'],
-    rating: 4.5,
-    isComplete: true,
-    profilePhotoURL: icons.dummyDoctor,
-    isCancelled: false,
-  },
-];
+import firestore from '@react-native-firebase/firestore';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
 
 export default function ConsultHistory() {
   const [cancelConsultModalVisible, setCancelConsultModalVisible] =
     useState(false);
+  const [consultations, setConsultations] = useState<Consultation[]>([]);
+  const [selectedConsultation, setSelectedConsultation] =
+    useState<Consultation | null>(null);
+  const { user } = useSelector((state: RootState) => state.auth);
+
   const onPressReport = (item: Consultation) => {
-    if (item?.isComplete && !item?.isCancelled) {
+    if (item?.status === 'completed') {
       navigate('ConsultReport', { item });
     }
   };
 
-  const onPressCancel = () => {
+  const onPressCancel = (item?: Consultation) => {
+    if (item) setSelectedConsultation(item);
     setCancelConsultModalVisible(!cancelConsultModalVisible);
   };
 
+  const onPressYes = async () => {
+    if (!selectedConsultation) return;
+
+    try {
+      await firestore()
+        .collection('appointments')
+        .doc(selectedConsultation.id)
+        .update({
+          status: 'cancelled',
+        });
+
+      setConsultations(prev =>
+        prev.map(c =>
+          c.id === selectedConsultation.id ? { ...c, status: 'cancelled' } : c,
+        ),
+      );
+
+      setCancelConsultModalVisible(false);
+      setSelectedConsultation(null);
+    } catch (error) {
+      console.error('Error cancelling consultation:', error);
+    }
+  };
+
+  useEffect(() => {
+    const getData = async () => {
+      const querySnapshot = await firestore()
+        .collection('appointments')
+        .where('patientId', '==', user?.uid)
+        .get();
+
+      if (!querySnapshot.empty) {
+        const data: Consultation[] = [];
+        querySnapshot.forEach(doc => {
+          const reviewData = doc.data();
+          if (reviewData) {
+            data.push({
+              ...(reviewData as Consultation),
+              id: doc.id,
+            });
+          }
+        });
+        setConsultations(data);
+      }
+    };
+    getData();
+  }, [user?.uid]);
+
   const renderItem = ({ item }: { item: Consultation }) => {
     const cancelStyle = {
-      opacity: item?.isCancelled && !item?.isComplete ? 0.5 : 1,
+      opacity: item?.status === 'cancelled' ? 0.5 : 1,
     };
     return (
       <TouchableOpacity
         style={[styles.card, cancelStyle]}
         activeOpacity={0.7}
-        onPress={() => {
-          onPressReport(item);
-        }}
-        disabled={item?.isCancelled}
+        onPress={() => onPressReport(item)}
+        disabled={item?.status === 'cancelled'}
       >
         <Text
           style={[
             styles.consultStatus,
             {
               color:
-                item?.isCancelled && !item?.isComplete
-                  ? colors.cancelRed
-                  : colors.text,
+                item?.status === 'cancelled' ? colors.cancelRed : colors.text,
             },
           ]}
         >
-          {item?.isComplete && !item?.isCancelled
+          {item?.status === 'completed'
             ? 'Complete Consult'
-            : item?.isCancelled && !item?.isComplete
+            : item?.status === 'cancelled'
             ? 'Cancel Consult'
             : 'Upcoming Consult'}
         </Text>
+
         <View style={styles.cardContainerView}>
           <View style={styles.cardLeftView}>
-            <Image source={item.profilePhotoURL} style={styles.doctorAvatar} />
+            <Image source={icons.dummyDoctor} style={styles.doctorAvatar} />
             <View style={styles.doctorDetails}>
-              <Text style={styles.doctorNameText}>{item.doctor}</Text>
+              <Text style={styles.doctorNameText}>Dr. {item.doctorName}</Text>
               <Text style={styles.doctorSpecializationText}>
-                {item.specialization}
+                Snr. Dermatologist (MD,OD)
               </Text>
-              <Text style={styles.concernText}>
-                Concern: {item?.Concern[0]}
-              </Text>
+              <Text style={styles.concernText}>Concern: {item?.disease}</Text>
               <Text style={styles.dateText}>{item.date}</Text>
             </View>
           </View>
+
           <View style={styles.cardRightView}>
-            <View>
-              <View style={styles.ratingView}>
-                <Image source={icons.starFilled} style={styles.starStyle} />
-                <Text style={styles.ratingCountText}>{item.rating}</Text>
-              </View>
-              <Text style={styles.ratingText}>Rating</Text>
-            </View>
-            {!item?.isComplete && !item?.isCancelled && (
+            {item?.status === 'Booked' && (
               <TouchableOpacity
                 style={styles.cancelButton}
-                onPress={onPressCancel}
+                onPress={() => onPressCancel(item)}
               >
                 <Text style={styles.cancelText}>Cancel</Text>
               </TouchableOpacity>
@@ -154,11 +164,12 @@ export default function ConsultHistory() {
           contentContainerStyle={styles.listContainer}
         />
       )}
+
       <CancelConsultationModal
         visible={cancelConsultModalVisible}
-        onPressBack={onPressCancel}
-        onPressYes={onPressCancel}
-        onPressNo={onPressCancel}
+        onPressBack={() => onPressCancel()}
+        onPressYes={onPressYes}
+        onPressNo={() => onPressCancel()}
       />
     </View>
   );
@@ -267,27 +278,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     height: hp(10.46),
-  },
-  ratingView: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  starStyle: {
-    height: wp(5.33),
-    width: wp(5.33),
-    tintColor: colors.primary,
-    marginRight: wp(0.8),
-  },
-  ratingCountText: {
-    fontSize: fontSize(20),
-    color: colors.secondaryPurple,
-    fontFamily: fonts.Semibold,
-  },
-  ratingText: {
-    fontFamily: fonts.Semibold,
-    fontSize: fontSize(12),
-    textAlign: 'center',
-    color: colors.textRGBA,
   },
   cancelButton: {
     backgroundColor: colors.cancelRed,

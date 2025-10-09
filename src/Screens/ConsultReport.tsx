@@ -1,5 +1,5 @@
 import { RouteProp, useRoute } from '@react-navigation/native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Image,
   ImageBackground,
@@ -12,10 +12,15 @@ import { Consultation } from '../Constant/types';
 import { Header } from '../Components/common/Header';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../Constant/Colors';
-import { fontSize, goBack, hp, navigate, wp } from '../Helpers/globalFunction';
+import { fontSize, hp, navigate, wp } from '../Helpers/globalFunction';
 import { icons } from '../Constant/Icons';
 import { fonts } from '../Constant/Fonts';
 import LinearButton from '../Components/common/LinearButton';
+import moment from 'moment';
+import firestore from '@react-native-firebase/firestore';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
+import RenderHTML from 'react-native-render-html';
 
 type RootStackParamList = {
   ConsultReport: { item: Consultation };
@@ -26,17 +31,65 @@ type ConsultReportRouteProp = RouteProp<RootStackParamList, 'ConsultReport'>;
 export default function ConsultReport(): React.JSX.Element {
   const route = useRoute<ConsultReportRouteProp>();
   const { item } = route.params;
+  const { user } = useSelector((state: RootState) => state.auth);
 
-  const items = [
-    'Acne & Pimples: Presence of active breakouts and acne marks.',
-    'Dark Circles: Mild to moderate pigmentation under the eyes.',
-    'Fine Lines/Wrinkles: Early signs of aging around the forehead and eyes.',
-    'Skin Texture: Uneven surface due to acne and dryness.',
-  ];
+  const [prescriptionData, setPrescriptionData] = useState<any>(null);
+  const [aiAnalysisData, setAiAnalysisData] = useState<any>(null);
+  console.log('🚀 ~ ConsultReport ~ aiAnalysisData:', aiAnalysisData);
 
   const onPressBuyMedicine = () => {
     navigate('OrderDetails');
   };
+
+  useEffect(() => {
+    const getData = async () => {
+      if (!user?.uid || !item?.prescriptionId) return;
+
+      try {
+        const prescriptionDocRef = firestore()
+          .collection('users')
+          .doc(user.uid)
+          .collection('prescriptions')
+          .doc(item.prescriptionId);
+
+        const docSnapshot = await prescriptionDocRef.get();
+
+        if (docSnapshot.exists()) {
+          setPrescriptionData(docSnapshot.data());
+        } else {
+          console.warn('Prescription not found');
+        }
+      } catch (error) {
+        console.error('Error fetching prescription:', error);
+      }
+
+      try {
+        const aiConsultationRef = firestore().collection('aiConsultation');
+
+        const querySnapshot = await aiConsultationRef
+          .where('userId', '==', user?.uid)
+          .get();
+
+        if (!querySnapshot.empty) {
+          const docData = querySnapshot.docs[0].data();
+
+          const reviews = docData.review || [];
+
+          reviews.forEach((r: any) => {
+            if (r?.id === item?.aiConsultationId) {
+              setAiAnalysisData(r);
+            }
+          });
+        } else {
+          console.log('No consultation found for this user.');
+        }
+      } catch (error) {
+        console.error('Error fetching review IDs:', error);
+      }
+    };
+
+    getData();
+  }, [user?.uid, item?.prescriptionId, item?.aiConsultationId]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -47,11 +100,11 @@ export default function ConsultReport(): React.JSX.Element {
           source={icons.checksGradient}
         >
           <View style={styles.doctorDetailsView}>
-            <Image style={styles.doctorImage} source={item.profilePhotoURL} />
+            <Image style={styles.doctorImage} source={icons.dummyDoctor} />
             <View style={styles.doctorNameContainer}>
-              <Text style={styles.doctorName}>{item?.doctor}</Text>
+              <Text style={styles.doctorName}>{item?.doctorName}</Text>
               <Text style={styles.doctorPositionName}>
-                {item?.specialization}
+                Snr. Dermatologist (MD,OD)
               </Text>
             </View>
           </View>
@@ -88,65 +141,72 @@ export default function ConsultReport(): React.JSX.Element {
         <View style={styles.timeContainer}>
           <View style={styles.timeView}>
             <Image style={styles.timeImageStyle} source={icons.clock} />
-            <Text style={styles.timeText}>10:00-10:30 A.M.</Text>
+            <Text style={styles.timeText}>{item?.time}</Text>
           </View>
           <View style={styles.timeView}>
             <Image style={styles.timeImageStyle} source={icons.calendar} />
-            <Text style={styles.timeText}>Mon, 12 Aug 2025 </Text>
+            <Text style={styles.timeText}>
+              {moment(item?.date).format('ddd, DD MMM YYYY')}
+            </Text>
           </View>
         </View>
-        <View style={styles.concernContainer}>
-          <Text style={styles.concernTitleText}>Concern reason</Text>
-          <View style={styles.concernView}>
-            {item?.Concern?.map(data => {
-              return (
-                <View style={styles.concernNameView}>
-                  <Text style={styles.concernTextStyle}>{data}</Text>
-                </View>
-              );
-            })}
-          </View>
-        </View>
-        <Text style={styles.consultationHighlightsText}>
-          Consultation Highlights
-        </Text>
+        <Text style={styles.consultationHighlightsText}>Doctor's Remark</Text>
         <View style={styles.consultationHighlightsContainer}>
-          {items.map((item, index) => (
-            <View key={index} style={styles.listItem}>
-              <Text style={styles.bullet}>&bull;</Text>
-              <Text style={styles.itemText}>{item}</Text>
-            </View>
-          ))}
+          <RenderHTML
+            contentWidth={wp(100)}
+            source={{ html: prescriptionData?.doctorConsultationReport }}
+            baseStyle={styles.htmlText}
+          />
         </View>
-        <Text style={styles.recommendedCareText}>Recommended Care</Text>
-        <View style={styles.recommendedCareContainer}>
-          {items.map((item, index) => (
-            <View key={index} style={styles.listItem}>
-              <Text style={styles.bullet}>&bull;</Text>
-              <Text style={styles.itemText}>{item}</Text>
-            </View>
-          ))}
+        <Text style={styles.consultationHighlightsText}>AI Analysis</Text>
+        <View style={styles.consultationHighlightsContainer}>
+          {aiAnalysisData?.aiConsultation?.map(
+            (consult: any, index: number) => (
+              <View key={index} style={styles.listItem}>
+                <Text style={styles.bullet}>{'\u2022'}</Text>
+                <Text style={styles.problemText}>
+                  {consult.problem} :{' '}
+                  <Text style={styles.descriptionText}>
+                    {consult.description}
+                  </Text>
+                </Text>
+              </View>
+            ),
+          )}
         </View>
         <View style={styles.medicineContainer}>
           <Text style={styles.takeThisMedicineText}>Take this medicine</Text>
           <Image source={icons.info} style={styles.infoIcon} />
         </View>
-        <View>
-          <Text style={styles.morningText}>In morning</Text>
+        {prescriptionData?.medications &&
+        prescriptionData.medications.length > 0 ? (
+          <View>
+            {prescriptionData.medications.map((med: any, index: number) => (
+              <View key={index}>
+                {med.timeOfDay && (
+                  <Text style={styles.morningText}>
+                    {med.timeOfDay
+                      .replace(/_/g, ', ')
+                      .split(' ')
+                      .map(
+                        (word: string) =>
+                          word.charAt(0).toUpperCase() + word.slice(1),
+                      )
+                      .join(' ')}
+                  </Text>
+                )}
 
-          <Text style={styles.medicineNameText}>
-            Gentle cleanser (non-foaming, pH balanced)
+                <Text style={styles.medicineNameText}>
+                  {med.medication}, ({med.dosage})
+                </Text>
+              </View>
+            ))}
+          </View>
+        ) : (
+          <Text style={[styles.medicineNameText, styles.noMedicineText]}>
+            No medicines prescribed.
           </Text>
-          <Text style={styles.medicineNameText}>
-            Sunscreen SPF 30+ (broad-spectrum, oil-free)
-          </Text>
-          <Text style={styles.morningText}>In night</Text>
-
-          <Text style={styles.medicineNameText}>Topical anti-acne cream</Text>
-          <Text style={styles.medicineNameText}>
-            Zinc tablets (once daily, after food)
-          </Text>
-        </View>
+        )}
       </ScrollView>
       <View>
         <LinearButton
@@ -250,6 +310,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: wp(4),
     paddingVertical: wp(2.66),
     borderRadius: wp(4),
+    marginBottom: hp(1.84),
   },
   timeView: {
     flexDirection: 'row',
@@ -265,43 +326,18 @@ const styles = StyleSheet.create({
     fontFamily: fonts.Semibold,
     color: colors.background,
   },
-  concernContainer: {
-    marginTop: hp(3.07),
-  },
-  concernTitleText: {
-    fontFamily: fonts.Semibold,
-    fontSize: fontSize(20),
-    color: colors.black,
-  },
-  concernView: {
-    paddingTop: hp(1.23),
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  concernNameView: {
-    backgroundColor: colors.primary,
-    marginRight: wp(2.66),
-    paddingHorizontal: wp(2.66),
-    paddingVertical: wp(1.33),
-    marginBottom: wp(2.66),
-    borderRadius: wp(100),
-  },
-  concernTextStyle: {
-    fontFamily: fonts.Semibold,
-    fontSize: fontSize(16),
-    color: colors.secondaryPurple,
-  },
   consultationHighlightsContainer: {
     borderWidth: wp(0.23),
-    paddingTop: wp(4),
+    padding: wp(4),
     paddingHorizontal: wp(4),
     borderRadius: wp(5.33),
+    marginBottom: hp(2.53),
   },
   consultationHighlightsText: {
     fontSize: fontSize(20),
     fontFamily: fonts.Semibold,
     color: colors.text,
-    marginVertical: hp(1.84),
+    marginBottom: hp(1.84),
   },
   listItem: {
     flexDirection: 'row',
@@ -312,31 +348,20 @@ const styles = StyleSheet.create({
     fontSize: fontSize(16),
     marginRight: wp(2.33),
   },
-  itemText: {
-    flex: 1,
-    fontSize: fontSize(14),
-    fontFamily: fonts.Regular,
-    color: colors.text,
-  },
-  recommendedCareText: {
-    fontSize: fontSize(20),
+  problemText: {
+    fontSize: fontSize(16),
     fontFamily: fonts.Semibold,
     color: colors.text,
-    marginTop: hp(3.07),
-    marginBottom: hp(1.84),
   },
-  recommendedCareContainer: {
-    borderWidth: wp(0.23),
-    paddingTop: wp(4),
-    paddingHorizontal: wp(4),
-    borderRadius: wp(5.33),
-    backgroundColor: colors.secondaryGray,
+  descriptionText: {
+    fontSize: fontSize(16),
+    fontFamily: fonts.Regular,
+    color: colors.text,
   },
   medicineContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: hp(3.07),
     marginBottom: hp(1.84),
   },
   takeThisMedicineText: {
@@ -363,6 +388,10 @@ const styles = StyleSheet.create({
     paddingVertical: hp(1.41),
     marginBottom: hp(1.72),
   },
+  noMedicineText: {
+    textAlign: 'center',
+    color: colors.textRGBA,
+  },
   buyMedicineButton: {
     backgroundColor: colors.primary,
     marginHorizontal: wp(4.26),
@@ -375,5 +404,10 @@ const styles = StyleSheet.create({
   buyMedicineText: {
     fontSize: fontSize(16),
     fontFamily: fonts.Semibold,
+  },
+  htmlText: {
+    fontSize: fontSize(16),
+    color: colors.text,
+    fontFamily: fonts.Medium,
   },
 });

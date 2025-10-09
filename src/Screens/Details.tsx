@@ -1,73 +1,30 @@
 import React from 'react';
 import { Header } from '../Components/common/Header';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../Constant/Colors';
-import { fontSize, hp, navigate, wp } from '../Helpers/globalFunction';
+import { fontSize, hp, wp } from '../Helpers/globalFunction';
 import { icons } from '../Constant/Icons';
 import { fonts } from '../Constant/Fonts';
+import { RouteProp } from '@react-navigation/native';
+import { SkinScanItem, AIConsultation } from '../Constant/types';
 
-const items = [
-  {
-    detectedProblem: 'Acne & Pimple',
-    severity: 'High',
-  },
-  {
-    detectedProblem: 'Pigmentation',
-    severity: 'Moderate',
-  },
-  {
-    detectedProblem: 'Dark Circles',
-    severity: 'High',
-  },
-];
+type RootStackParamList = {
+  SkinScanHistory: undefined;
+  Details: { item: SkinScanItem };
+};
 
-const analysisItems = [
-  {
-    title: 'Acne & Pimples',
-    points: [
-      'Small red pimples are present on the cheeks, chin, and forehead.',
-      'Mild inflammatory acne with visible redness.',
-    ],
-  },
-  {
-    title: 'Post-Acne Marks / Blemishes',
-    points: [
-      'Light spots and pigmentation visible in areas affected by previous breakouts.',
-    ],
-  },
-  {
-    title: 'Dark Circles',
-    points: [
-      'Mild to moderate dark circles under the eyes, possibly due to pigmentation or tiredness.',
-    ],
-  },
-  {
-    title: 'Fine Lines / Early Wrinkles',
-    points: [
-      'Subtle lines on the forehead, suggesting early signs of aging or skin stress.',
-    ],
-  },
-  {
-    title: 'Overall Skin Texture',
-    points: [
-      'Uneven skin tone with slight roughness.',
-      'Enlarged pores in cheek and T–zone area.',
-    ],
-  },
-];
+type DetailsRouteProp = RouteProp<RootStackParamList, 'Details'>;
 
-export default function Details(): React.JSX.Element {
-  const onPressDisease = (item: string) => {
-    navigate('DiseaseDetails', { item });
-  };
+type Props = {
+  route: DetailsRouteProp;
+};
+
+export default function Details({ route }: Props): React.JSX.Element {
+  const { item: scanItem } = route.params;
+  // const onPressDisease = (disease: string) => {
+  //   navigate('DiseaseDetails', { item: disease });
+  // };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -82,42 +39,60 @@ export default function Details(): React.JSX.Element {
         </View>
         <Text style={styles.reportText}>Report</Text>
         <View style={styles.problemsContainer}>
-          {items?.map(item => {
+          {(scanItem?.aiConsultation ?? []).map((ai: AIConsultation) => {
             return (
-              <TouchableOpacity
-                style={styles.problemContainer}
-                onPress={() => {
-                  onPressDisease(item?.detectedProblem);
-                }}
-              >
-                <View>
-                  <Text style={styles.problemText}>
-                    {item?.detectedProblem}
+              // <TouchableOpacity
+              //   key={idx}
+              //   style={styles.problemContainer}
+              //   onPress={() => {
+              //     onPressDisease(ai?.problem);
+              //   }}
+              // >
+              <View style={styles.problemContainer}>
+                <View style={styles.problemTextContainer}>
+                  <Text
+                    style={styles.problemText}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {ai?.problem}
                   </Text>
-                  <Text style={styles.severityText}>{item?.severity}</Text>
+                  <Text
+                    style={styles.severityText}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {ai?.severity}
+                  </Text>
                 </View>
                 <Image
                   source={icons.crossArrow}
                   style={styles.crossArrowStyle}
                 />
-              </TouchableOpacity>
+              </View>
+              // </TouchableOpacity>
             );
           })}
         </View>
         <Text style={styles.reportText}>Ai Analysis</Text>
         <View style={styles.problemDetailsContainer}>
-          {analysisItems.map((item, index) => (
-            <View key={index}>
-              <Text style={styles.analysisTitle}>
-                {index + 1}. {item.title}
-              </Text>
-              {item.points.map((point, idx) => (
-                <Text key={idx} style={styles.analysisBullet}>
-                  • {point}
+          {(scanItem?.aiConsultation ?? []).map(
+            (ai: AIConsultation, index: number) => (
+              <View key={index}>
+                <Text style={styles.analysisTitle}>
+                  {index + 1}. {ai?.problem}
                 </Text>
-              ))}
-            </View>
-          ))}
+                {ai?.description ? (
+                  <Text style={styles.analysisBullet}>• {ai.description}</Text>
+                ) : null}
+                {ai?.recommended_action ? (
+                  <Text style={styles.analysisBullet}>
+                    • {ai.recommended_action}
+                  </Text>
+                ) : null}
+              </View>
+            ),
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -163,8 +138,12 @@ const styles = StyleSheet.create({
     width: wp(42.13),
     marginBottom: hp(1.84),
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  problemTextContainer: {
+    width: wp(29),
+    paddingRight: wp(2),
   },
   problemText: {
     fontFamily: fonts.Semibold,

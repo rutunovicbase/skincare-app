@@ -202,27 +202,28 @@ function Scan() {
     try {
       const aiConsultationRef = firestore().collection('aiConsultation');
 
+      const reviewId = firestore().collection('_').doc().id;
+
+      const newReview = {
+        id: reviewId,
+        aiConsultation: analysisResult,
+        createdAt: moment().toISOString(),
+      };
+
       const querySnapshot = await aiConsultationRef
         .where('userId', '==', uid)
         .get();
 
       if (!querySnapshot.empty) {
-        const docRef = querySnapshot.docs[0].ref; // Assuming one doc per userId
+        const docRef = querySnapshot.docs[0].ref;
         await docRef.update({
-          review: firestore.FieldValue.arrayUnion({
-            aiConsultation: analysisResult,
-            createdAt: moment().toISOString(),
-          }),
+          review: firestore.FieldValue.arrayUnion(newReview),
         });
       } else {
         await aiConsultationRef.add({
           userId: uid,
-          review: [
-            {
-              aiConsultation: analysisResult,
-              createdAt: moment().toISOString(),
-            },
-          ],
+          review: [newReview],
+          createdAt: moment().toISOString(),
         });
       }
 

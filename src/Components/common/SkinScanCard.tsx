@@ -4,18 +4,32 @@ import { colors } from '../../Constant/Colors';
 import { fontSize, hp, wp } from '../../Helpers/globalFunction';
 import { fonts } from '../../Constant/Fonts';
 import { icons } from '../../Constant/Icons';
+import moment from 'moment';
 
-export function SkinScanCard({ onPress }: { onPress: () => void }) {
+export function SkinScanCard({
+  onPress,
+  item,
+}: {
+  onPress: () => void;
+  item: any;
+}) {
   return (
     <TouchableOpacity style={styles.card} activeOpacity={0.7} onPress={onPress}>
       <View style={styles.titleView}>
         <Text style={styles.title}>Face skin scan</Text>
         <Image source={icons.crossArrow} style={styles.crossArrowIcon} />
       </View>
-      <Text style={styles.date}>Sun, 11 Aug 10:00 A.M.</Text>
+      <Text style={styles.date}>
+        {moment(item.createdAt).format('DD MMM YYYY, hh:mm A')}
+      </Text>
       <View style={styles.problemView}>
-        <Text style={styles.problemText}>Pimples</Text>
-        <Text style={styles.problemText}>Pigmentation</Text>
+        {item?.aiConsultation
+          ?.slice(0, 2)
+          .map((problem: any, index: number) => (
+            <Text key={index} style={styles.problemText}>
+              {problem?.problem}
+            </Text>
+          ))}
       </View>
     </TouchableOpacity>
   );
@@ -52,6 +66,7 @@ const styles = StyleSheet.create({
   problemView: {
     flexDirection: 'row',
     alignItems: 'center',
+    overflow: 'hidden',
   },
   problemText: {
     backgroundColor: colors.secondaryPurple,

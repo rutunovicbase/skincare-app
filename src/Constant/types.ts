@@ -25,14 +25,23 @@ export interface AnimatedTabBarIconProps {
 
 export type Consultation = {
   id: string;
-  doctor: string;
-  specialization: string;
-  Concern: string[];
+  createdAt: string;
+  createdBy: string;
   date: string;
-  rating: number;
-  isComplete?: boolean;
-  profilePhotoURL: ImageSourcePropType;
-  isCancelled?: boolean;
+  disease: string;
+  duration: number;
+  notes: string;
+  patientId: string;
+  patientName: string;
+  profilePhotoURL: string;
+  sessionId: string;
+  status: 'completed' | 'pending' | 'cancelled' | string;
+  time: string;
+  type: 'New' | 'Follow-up' | string;
+  doctorId: string;
+  doctorName: string;
+  prescriptionId: string;
+  aiConsultationId: string;
 };
 
 export type MedicineDetails = {
@@ -59,4 +68,16 @@ export type BillingProps = {
 export type RootStackParamList = {
   OTPVerification: { confirmation: any };
   Onboarding: undefined;
+};
+
+export type AIConsultation = {
+  description: string;
+  problem: string;
+  recommended_action: string;
+  severity: string;
+};
+
+export type SkinScanItem = {
+  aiConsultation: AIConsultation[];
+  createdAt: string;
 };
