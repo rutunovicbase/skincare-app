@@ -11,12 +11,13 @@ export function OrderCard({
   quantitiy,
   mrp,
   discount,
+  dosage,
 }: MedicineDetails): React.JSX.Element {
   return (
     <View style={styles.container}>
       <View style={styles.medicineDetailsContainer}>
         <Text style={styles.medicineName} numberOfLines={2}>
-          {name}
+          {name} ({dosage})
         </Text>
         <Text style={styles.quantityText}>Quantity: {quantitiy}</Text>
         <Text style={styles.medicineName}>

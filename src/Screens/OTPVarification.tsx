@@ -78,9 +78,7 @@ function OTPVerification({ route, navigation }: Props): React.JSX.Element {
           !!result?.additionalUserInfo?.isNewUser,
         );
       }
-    } catch (error) {
-      console.log('err', error);
-    }
+    } catch (error) {}
   };
 
   return (

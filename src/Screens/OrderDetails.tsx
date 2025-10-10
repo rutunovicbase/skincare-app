@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header } from '../Components/common/Header';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -8,46 +8,73 @@ import { OrderCard } from '../Components/common/OrderCard';
 import { fonts } from '../Constant/Fonts';
 import { BillingDetails } from '../Components/common/BillingDetails';
 import LinearButton from '../Components/common/LinearButton';
+import { RouteProp, useRoute } from '@react-navigation/native';
+import { OrderDetailsData } from '../Constant/types';
+import firestore from '@react-native-firebase/firestore';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
+import moment from 'moment';
+
+type RootStackParamList = {
+  OrderDetails: { data: OrderDetailsData };
+};
+
+type OrderDetailsRouteProp = RouteProp<RootStackParamList, 'OrderDetails'>;
 
 export default function OrderDetails(): React.JSX.Element {
-  const onPressProceed = () => {
-    navigate('OrderReview');
+  const route = useRoute<OrderDetailsRouteProp>();
+  const { data } = route.params;
+  const [grandTotal, setGrandTotal] = useState(0);
+  const user = useSelector((s: RootState) => s.auth.user);
+
+  const onPressProceed = async () => {
+    try {
+      if (!user?.uid) return;
+
+      const ordersRef = firestore().collection('orders');
+
+      const orderPayload: any = {
+        userId: user.uid,
+        items: data?.medications || [],
+        total: data?.totalPrice ?? 0,
+        status: 'processing',
+        createdAt: moment().toISOString(),
+      };
+
+      const docRef = await ordersRef.add(orderPayload);
+
+      await docRef.update({ orderId: docRef.id });
+
+      navigate('OrderReview', { data });
+    } catch (err) {
+      console.warn('Failed to create order', err);
+      navigate('OrderReview', { data });
+    }
   };
+
   return (
     <SafeAreaView style={styles.container}>
       <Header title="Order details" isPadding />
       <ScrollView style={styles.mainContainer}>
         <View style={styles.contentContainer}>
-          <OrderCard
-            name="Gentle cleanser (non-foaming, pH balanced)"
-            mrp={299}
-            quantitiy="1 (10 Tablets)"
-            discount={10}
-          />
-          <OrderCard
-            name="Topical anti-acne cream 150ml"
-            mrp={299}
-            quantitiy="1"
-            discount={10}
-          />
-          <OrderCard
-            name="Zinc tablets (once daily, after food) "
-            mrp={299}
-            quantitiy="1 (10 Tablets)"
-            discount={10}
-          />
-          <OrderCard
-            name="Sunscreen SPF 30+ (broad-spectrum, oil-free) 150ml"
-            mrp={299}
-            quantitiy="1"
-            discount={10}
-          />
+          {data?.medications.map((item, index) => (
+            <OrderCard
+              key={index}
+              name={item.medication}
+              dosage={item.dosage}
+              mrp={item.price}
+              // quantitiy={item.quantity}
+              // discount={item.discount}
+            />
+          ))}
           <Text style={styles.billingDetailsText}>Billing details</Text>
           <BillingDetails
-            total={1196}
-            discount={150}
+            total={data?.totalPrice}
+            discount={15}
             delivery={99}
-            taxes={215}
+            taxes={45}
+            grandTotal={grandTotal}
+            setGrandTotal={setGrandTotal}
           />
           <View style={styles.continueButtonContainer}>
             <LinearButton

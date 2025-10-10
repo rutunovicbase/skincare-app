@@ -113,7 +113,14 @@ export default function ConsultHistory() {
 
         <View style={styles.cardContainerView}>
           <View style={styles.cardLeftView}>
-            <Image source={icons.dummyDoctor} style={styles.doctorAvatar} />
+            <Image
+              source={
+                item?.doctorProfilePhoto
+                  ? { uri: item.doctorProfilePhoto }
+                  : icons.dummyDoctor
+              }
+              style={styles.doctorAvatar}
+            />
             <View style={styles.doctorDetails}>
               <Text style={styles.doctorNameText}>Dr. {item.doctorName}</Text>
               <Text style={styles.doctorSpecializationText}>

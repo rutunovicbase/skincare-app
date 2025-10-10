@@ -1,13 +1,6 @@
 import { RouteProp, useRoute } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import {
-  Image,
-  ImageBackground,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Consultation } from '../Constant/types';
 import { Header } from '../Components/common/Header';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -35,10 +28,9 @@ export default function ConsultReport(): React.JSX.Element {
 
   const [prescriptionData, setPrescriptionData] = useState<any>(null);
   const [aiAnalysisData, setAiAnalysisData] = useState<any>(null);
-  console.log('🚀 ~ ConsultReport ~ aiAnalysisData:', aiAnalysisData);
 
   const onPressBuyMedicine = () => {
-    navigate('OrderDetails');
+    navigate('OrderDetails', { data: prescriptionData });
   };
 
   useEffect(() => {
@@ -80,8 +72,6 @@ export default function ConsultReport(): React.JSX.Element {
               setAiAnalysisData(r);
             }
           });
-        } else {
-          console.log('No consultation found for this user.');
         }
       } catch (error) {
         console.error('Error fetching review IDs:', error);
@@ -95,49 +85,24 @@ export default function ConsultReport(): React.JSX.Element {
     <SafeAreaView style={styles.container}>
       <Header title="Consult details" isPadding />
       <ScrollView style={styles.mainContainer}>
-        <ImageBackground
-          style={styles.cardContainer}
-          source={icons.checksGradient}
-        >
+        <View style={styles.cardContainer}>
           <View style={styles.doctorDetailsView}>
-            <Image style={styles.doctorImage} source={icons.dummyDoctor} />
-            <View style={styles.doctorNameContainer}>
-              <Text style={styles.doctorName}>{item?.doctorName}</Text>
-              <Text style={styles.doctorPositionName}>
-                Snr. Dermatologist (MD,OD)
-              </Text>
-            </View>
+            <Image
+              style={styles.doctorImage}
+              source={
+                item?.doctorProfilePhoto
+                  ? { uri: item.doctorProfilePhoto }
+                  : icons.dummyDoctor
+              }
+            />
           </View>
-          <View style={styles.doctorSpecializationContainer}>
-            <View style={styles.doctorExperienceView}>
-              <Text style={styles.yearsText}>
-                <Text style={styles.experienceCountText}>+4</Text>/years
-              </Text>
-              <Text style={[styles.yearsText, styles.experienceText]}>
-                Experience
-              </Text>
-            </View>
-            <View style={styles.doctorExperienceView}>
-              <Text style={styles.experienceCountText}>+41k</Text>
-              <Text style={[styles.yearsText, styles.experienceText]}>
-                Patients
-              </Text>
-            </View>
-            <View style={styles.doctorExperienceView}>
-              <View style={styles.starRatingContainer}>
-                <Image
-                  source={icons.starFilled}
-                  tintColor={colors.primary}
-                  style={styles.starStyle}
-                />
-                <Text style={styles.experienceCountText}>4.5</Text>
-              </View>
-              <Text style={[styles.yearsText, styles.experienceText]}>
-                Rating
-              </Text>
-            </View>
+          <View style={styles.doctorNameContainer}>
+            <Text style={styles.doctorName}>Dr. {item?.doctorName}</Text>
+            <Text style={styles.doctorPositionName}>
+              Snr. Dermatologist (MD,OD)
+            </Text>
           </View>
-        </ImageBackground>
+        </View>
         <View style={styles.timeContainer}>
           <View style={styles.timeView}>
             <Image style={styles.timeImageStyle} source={icons.clock} />
@@ -226,86 +191,39 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   cardContainer: {
-    backgroundColor: colors.secondaryPurple,
-    borderRadius: wp(5.33),
     marginTop: hp(3.07),
   },
   doctorImage: {
-    height: hp(22.53),
-    width: wp(50.66),
+    height: hp(25),
+    width: '100%',
+    borderRadius: wp(5.33),
+    resizeMode: 'cover',
   },
   mainContainer: {
     paddingHorizontal: wp(4.26),
   },
   doctorDetailsView: {
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   doctorNameContainer: {
-    position: 'absolute',
-    left: wp(41.86),
-    top: hp(6.4),
+    marginTop: hp(1.23),
   },
   doctorName: {
     fontSize: fontSize(25),
     fontFamily: fonts.Semibold,
-    color: colors.background,
-    marginBottom: hp(0.61),
+    color: colors.text,
   },
   doctorPositionName: {
     fontSize: fontSize(16),
     fontFamily: fonts.Semibold,
-    color: colors.background,
-    width: wp(37.06),
-    textAlign: 'right',
-    alignSelf: 'flex-end',
-  },
-  doctorSpecializationContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    position: 'absolute',
-    bottom: -hp(6.41),
-    width: '100%',
-  },
-  doctorExperienceView: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.secondaryGray,
-    width: wp(24),
-    height: hp(9.85),
-    borderRadius: wp(4),
-    elevation: 3,
-  },
-  yearsText: {
-    fontSize: fontSize(12),
-    fontFamily: fonts.Semibold,
     color: colors.textRGBA,
-  },
-  experienceCountText: {
-    fontSize: fontSize(20),
-    color: colors.secondaryPurple,
-    fontFamily: fonts.Semibold,
-  },
-  experienceText: {
-    marginTop: hp(0.61),
-  },
-  starStyle: {
-    height: wp(5.33),
-    width: wp(5.33),
-    marginRight: wp(0.8),
-  },
-  starRatingContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   timeContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: hp(8.25),
+    marginTop: hp(1.84),
     backgroundColor: colors.secondaryPurple,
     paddingHorizontal: wp(4),
     paddingVertical: wp(2.66),

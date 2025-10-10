@@ -42,13 +42,15 @@ export type Consultation = {
   doctorName: string;
   prescriptionId: string;
   aiConsultationId: string;
+  doctorProfilePhoto: string;
 };
 
 export type MedicineDetails = {
   name: string;
-  quantitiy: string;
-  mrp: number;
+  quantitiy?: string;
+  mrp?: number;
   discount?: number;
+  dosage: string;
 };
 
 export type OrderStatus = {
@@ -58,12 +60,14 @@ export type OrderStatus = {
   onPress: () => void;
 };
 
-export type BillingProps = {
+export interface BillingProps {
   total: number;
   discount: number;
   taxes: number;
   delivery: number;
-};
+  grandTotal?: number;
+  setGrandTotal?: (value: number) => void;
+}
 
 export type RootStackParamList = {
   OTPVerification: { confirmation: any };
@@ -80,4 +84,34 @@ export type AIConsultation = {
 export type SkinScanItem = {
   aiConsultation: AIConsultation[];
   createdAt: string;
+};
+
+export type Medication = {
+  date: string;
+  dosage: string;
+  duration?: string;
+  frequency: string;
+  medication: string;
+  notes: string;
+  patientAvatar: string;
+  prescribedBy?: string;
+  prescribedByName: string;
+  prescribedDate: string;
+  timeOfDay: string;
+  when: string;
+  price: number;
+};
+
+export type OrderDetailsData = {
+  id: string;
+  createdAt: string;
+  createdBy: string;
+  patientId: string;
+  patientName: string;
+  sessionId: string;
+  status: 'active' | 'inactive' | string;
+  totalMedications: number;
+  doctorConsultationReport: string;
+  medications: Medication[];
+  totalPrice: number;
 };

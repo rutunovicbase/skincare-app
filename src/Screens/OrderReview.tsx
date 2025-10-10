@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header } from '../Components/common/Header';
 import {
@@ -14,8 +14,20 @@ import { fonts } from '../Constant/Fonts';
 import LinearButton from '../Components/common/LinearButton';
 import { DeliverByCard } from '../Components/common/DeliverByCard';
 import { BillingDetails } from '../Components/common/BillingDetails';
+import { OrderDetailsData } from '../Constant/types';
+import { RouteProp, useRoute } from '@react-navigation/native';
+
+type RootStackParamList = {
+  OrderReview: { data: OrderDetailsData };
+};
+
+type OrderReviewRouteProp = RouteProp<RootStackParamList, 'OrderReview'>;
 
 export default function OrderReview(): React.JSX.Element {
+  const [grandTotal, setGrandTotal] = useState(0);
+  const route = useRoute<OrderReviewRouteProp>();
+  const { data } = route.params;
+
   const onPressAddAddress = () => {
     navigate('Address');
   };
@@ -40,7 +52,14 @@ export default function OrderReview(): React.JSX.Element {
         </View>
         <DeliverByCard />
         <Text style={styles.billingDetailsText}>Billing details</Text>
-        <BillingDetails total={1196} discount={150} delivery={99} taxes={215} />
+        <BillingDetails
+          total={data?.totalPrice}
+          discount={15}
+          delivery={99}
+          taxes={45}
+          grandTotal={grandTotal}
+          setGrandTotal={setGrandTotal}
+        />
         <Text style={styles.billingDetailsText}>Pick a Payment Method</Text>
         <View style={styles.paymentMethod}>
           <Text style={styles.paymentTitle}>UPI App</Text>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { fontSize, hp, wp } from '../../Helpers/globalFunction';
 import { colors } from '../../Constant/Colors';
@@ -10,7 +10,16 @@ export function BillingDetails({
   discount,
   taxes,
   delivery,
+  grandTotal,
+  setGrandTotal,
 }: BillingProps): React.JSX.Element {
+  useEffect(() => {
+    const calculated = total - discount + taxes + delivery;
+    if (setGrandTotal) {
+      setGrandTotal(calculated);
+    }
+  }, [total, discount, taxes, delivery, setGrandTotal]);
+
   return (
     <View style={styles.container}>
       <View style={styles.commonField}>
@@ -32,9 +41,7 @@ export function BillingDetails({
       <View style={styles.borderStyle} />
       <View style={[styles.grandTotalField, styles.commonField]}>
         <Text style={styles.fieldName}>Grand Total</Text>
-        <Text style={styles.fieldName}>
-          {total - discount + taxes + delivery}₹
-        </Text>
+        <Text style={styles.fieldName}>{grandTotal}₹</Text>
       </View>
     </View>
   );
