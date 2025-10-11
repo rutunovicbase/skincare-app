@@ -36,9 +36,11 @@ export default function OrderDetails(): React.JSX.Element {
       const orderPayload: any = {
         userId: user.uid,
         items: data?.medications || [],
-        total: data?.totalPrice ?? 0,
+        total: grandTotal ?? 0,
         status: 'processing',
         createdAt: moment().toISOString(),
+        userName: user?.firstName + ' ' + user?.lastName || '',
+        paymentStatus: 'pending',
       };
 
       const docRef = await ordersRef.add(orderPayload);
