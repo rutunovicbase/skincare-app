@@ -15,7 +15,6 @@ import moment from 'moment';
 
 export default function OrderDetails(): React.JSX.Element {
   const data = useSelector((s: RootState) => s.order.data);
-  console.log('🚀 ~ OrderDetails ~ data:', data);
   const [grandTotal, setGrandTotal] = useState(0);
   const user = useSelector((s: RootState) => s.auth.user);
 
