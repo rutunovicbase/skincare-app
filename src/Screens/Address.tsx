@@ -8,8 +8,9 @@ import { fontSize, hp, navigate, wp } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
 import { AddressCard } from '../Components/common/AddressCard';
 import firestore from '@react-native-firebase/firestore';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store/store';
+import { setSelectedAddress } from '../store/Slices/orderSlice';
 
 type UserAddress = {
   type: string;
@@ -24,9 +25,14 @@ type UserAddress = {
   createdAt?: string;
 };
 
+const EmptyAddresses = () => (
+  <Text style={styles.emptyText}>No saved addresses yet.</Text>
+);
+
 export default function Address(): React.JSX.Element {
   const user = useSelector((s: RootState) => s.auth.user);
   const [addresses, setAddresses] = useState<UserAddress[]>([]);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!user?.uid) return;
@@ -77,22 +83,18 @@ export default function Address(): React.JSX.Element {
                   await firestore()
                     .collection('users')
                     .doc(user.uid)
-                    .update({ addresses: firestore.FieldValue.arrayRemove(item as any) });
+                    .update({
+                      addresses: firestore.FieldValue.arrayRemove(item as any),
+                    });
                 } catch (_) {}
+              }}
+              onSelect={() => {
+                dispatch(setSelectedAddress(item));
+                navigate('OrderReview');
               }}
             />
           )}
-          ListEmptyComponent={() => (
-            <Text
-              style={{
-                flex: 1,
-                fontFamily: fonts.Medium,
-                color: colors.lightText,
-              }}
-            >
-              No saved addresses yet.
-            </Text>
-          )}
+          ListEmptyComponent={EmptyAddresses}
         />
       </View>
     </SafeAreaView>
@@ -142,5 +144,10 @@ const styles = StyleSheet.create({
     fontSize: fontSize(18),
     fontFamily: fonts.Semibold,
     marginBottom: hp(1.84),
+  },
+  emptyText: {
+    fontFamily: fonts.Medium,
+    color: colors.lightText,
+    paddingVertical: hp(2),
   },
 });

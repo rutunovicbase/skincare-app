@@ -1,9 +1,15 @@
 import remoteConfig from '@react-native-firebase/remote-config';
-import { yourLifestyle as defaultLifestyle, dietaryPreferences as defaultDiet, yourStressLevel as defaultStress } from '../Constant/Constant';
+import {
+  yourLifestyle as defaultLifestyle,
+  dietaryPreferences as defaultDiet,
+  yourStressLevel as defaultStress,
+} from '../Constant/Constant';
 
 type LocalizedList = Record<string, Array<{ key: string; title: string }>>;
 
-const buildDefaultLocalized = (list: Array<{ key: string; title: string }>): LocalizedList => ({ en: list });
+const buildDefaultLocalized = (
+  list: Array<{ key: string; title: string }>,
+): LocalizedList => ({ en: list });
 
 export const ensureRemoteDefaults = async () => {
   await remoteConfig().setDefaults({
@@ -12,7 +18,9 @@ export const ensureRemoteDefaults = async () => {
     yourStressLevel: JSON.stringify(buildDefaultLocalized(defaultStress)),
   });
 
-  await remoteConfig().setConfigSettings({ minimumFetchIntervalMillis: 60_000 });
+  await remoteConfig().setConfigSettings({
+    minimumFetchIntervalMillis: 60_000,
+  });
 };
 
 export const fetchAndActivateConfig = async () => {
@@ -33,10 +41,7 @@ export const getLocalizedList = (
     if (parsed['en'] && Array.isArray(parsed['en'])) return parsed['en'];
   } catch (_) {}
 
-  // Fallback to static
   if (key === 'yourLifestyle') return defaultLifestyle;
   if (key === 'dietaryPreferences') return defaultDiet;
   return defaultStress;
 };
-
-

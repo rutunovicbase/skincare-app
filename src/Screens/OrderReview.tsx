@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Header } from '../Components/common/Header';
 import {
@@ -14,22 +14,38 @@ import { fonts } from '../Constant/Fonts';
 import LinearButton from '../Components/common/LinearButton';
 import { DeliverByCard } from '../Components/common/DeliverByCard';
 import { BillingDetails } from '../Components/common/BillingDetails';
-import { OrderDetailsData } from '../Constant/types';
-import { RouteProp, useRoute } from '@react-navigation/native';
-
-type RootStackParamList = {
-  OrderReview: { data: OrderDetailsData };
-};
-
-type OrderReviewRouteProp = RouteProp<RootStackParamList, 'OrderReview'>;
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
+import firestore from '@react-native-firebase/firestore';
 
 export default function OrderReview(): React.JSX.Element {
   const [grandTotal, setGrandTotal] = useState(0);
-  const route = useRoute<OrderReviewRouteProp>();
-  const { data } = route.params;
+  const [selectedAddress, setSelectedAddress] = useState<any | null>(null);
+  const user = useSelector((s: RootState) => s.auth.user);
+  const orderData = useSelector((s: RootState) => s.order.data);
+  const orderSelectedAddress = useSelector(
+    (s: RootState) => s.order.selectedAddress,
+  );
+  useEffect(() => {
+    if (orderSelectedAddress) {
+      setSelectedAddress(orderSelectedAddress);
+      return;
+    }
+
+    if (!user?.uid) return;
+    const unsub = firestore()
+      .collection('users')
+      .doc(user.uid)
+      .onSnapshot(snap => {
+        const d = snap.data() as any;
+        const list = Array.isArray(d?.addresses) ? d.addresses : [];
+        setSelectedAddress(list.length ? list[0] : null);
+      });
+    return () => unsub();
+  }, [user?.uid, orderSelectedAddress]);
 
   const onPressAddAddress = () => {
-    navigate('Address');
+    navigate('Address', { selectMode: true });
   };
   return (
     <SafeAreaView style={styles.container}>
@@ -38,10 +54,18 @@ export default function OrderReview(): React.JSX.Element {
         <View style={styles.addressContainer}>
           <Text style={styles.deliverToText}>Deliver to</Text>
           <Text style={styles.addressText}>
-            D-101, abc complex, abc circle , adajan surat. 395005
+            {selectedAddress
+              ? `${selectedAddress.line1}, ${selectedAddress.street}${
+                  selectedAddress.landmark
+                    ? `, ${selectedAddress.landmark}`
+                    : ''
+                }, ${selectedAddress.city}, ${selectedAddress.state}. ${
+                  selectedAddress.pincode
+                }`
+              : 'No address selected'}
           </Text>
           <Text style={[styles.addressText, styles.mobileNoText]}>
-            mob no +91 0000000000
+            {selectedAddress ? `mob no ${selectedAddress.receiverPhone}` : ''}
           </Text>
           <LinearButton
             title="Add address"
@@ -53,7 +77,7 @@ export default function OrderReview(): React.JSX.Element {
         <DeliverByCard />
         <Text style={styles.billingDetailsText}>Billing details</Text>
         <BillingDetails
-          total={data?.totalPrice}
+          total={orderData?.totalPrice ?? 0}
           discount={15}
           delivery={99}
           taxes={45}

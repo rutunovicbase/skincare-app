@@ -88,7 +88,6 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
           : ClientRoleType.ClientRoleBroadcaster;
       engine.setClientRole(role);
 
-      // Join the channel only after the engine is fully initialized
       await joinChannel(rtcToken ?? '');
     } catch (error) {
       console.error('Failed to initialize Agora:', error);
@@ -398,7 +397,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     bottom: 0,
-    zIndex: 100, // Ensure controls are above the floating video
+    zIndex: 100,
   },
   controlButton: {
     width: wp(13.33),
@@ -411,7 +410,7 @@ const styles = StyleSheet.create({
   iconsStyle: {
     height: wp(6.4),
     width: wp(6.4),
-    tintColor: colors.background, // Ensure icons are visible
+    tintColor: colors.background,
   },
   endCallButton: {
     backgroundColor: colors.cancelRed,

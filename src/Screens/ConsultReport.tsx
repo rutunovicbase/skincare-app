@@ -11,8 +11,9 @@ import { fonts } from '../Constant/Fonts';
 import LinearButton from '../Components/common/LinearButton';
 import moment from 'moment';
 import firestore from '@react-native-firebase/firestore';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store/store';
+import { setOrderData } from '../store/Slices/orderSlice';
 import RenderHTML from 'react-native-render-html';
 
 type RootStackParamList = {
@@ -25,12 +26,13 @@ export default function ConsultReport(): React.JSX.Element {
   const route = useRoute<ConsultReportRouteProp>();
   const { item } = route.params;
   const { user } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch();
 
   const [prescriptionData, setPrescriptionData] = useState<any>(null);
   const [aiAnalysisData, setAiAnalysisData] = useState<any>(null);
 
   const onPressBuyMedicine = () => {
-    navigate('OrderDetails', { data: prescriptionData });
+    navigate('OrderDetails');
   };
 
   useEffect(() => {
@@ -47,7 +49,9 @@ export default function ConsultReport(): React.JSX.Element {
         const docSnapshot = await prescriptionDocRef.get();
 
         if (docSnapshot.exists()) {
-          setPrescriptionData(docSnapshot.data());
+          const pd = docSnapshot.data();
+          setPrescriptionData(pd);
+          dispatch(setOrderData(pd as any));
         } else {
           console.warn('Prescription not found');
         }
@@ -79,7 +83,7 @@ export default function ConsultReport(): React.JSX.Element {
     };
 
     getData();
-  }, [user?.uid, item?.prescriptionId, item?.aiConsultationId]);
+  }, [user?.uid, item?.prescriptionId, item?.aiConsultationId, dispatch]);
 
   return (
     <SafeAreaView style={styles.container}>

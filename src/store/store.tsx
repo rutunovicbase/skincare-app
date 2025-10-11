@@ -6,12 +6,14 @@ import languageReducer from './Slices/languageSlice';
 import authReducer from './Slices/authSlice';
 import remoteConfigReducer from './Slices/remoteConfigSlice';
 import notificationReducer from './Slices/notificationSlice';
+import orderReducer from './Slices/orderSlice';
 
 const rootReducer = combineReducers({
   language: languageReducer,
   auth: authReducer,
   remoteConfig: remoteConfigReducer,
   notification: notificationReducer,
+  order: orderReducer,
 });
 
 const persistConfig = {

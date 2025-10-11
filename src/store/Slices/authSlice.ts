@@ -101,7 +101,6 @@ export const signInWithGoogleIdToken = createAsyncThunk(
 
 export const signOut = createAsyncThunk('auth/signOut', async () => {
   try {
-    // No-op for Google sign-out when not using Google SDK directly
   } finally {
     await auth().signOut();
   }

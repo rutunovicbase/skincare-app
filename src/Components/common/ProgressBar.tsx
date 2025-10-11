@@ -12,7 +12,7 @@ import { fonts } from '../../Constant/Fonts';
 import { fontSize, wp } from '../../Helpers/globalFunction';
 
 interface ProgressBarProps {
-  currentStep: number; // 1-6
+  currentStep: number;
   totalSteps?: number;
   height?: number;
   backgroundColor?: string;

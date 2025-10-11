@@ -9,14 +9,18 @@ export function AddressCard({
   address,
   onEdit,
   onDelete,
+  onSelect,
 }: {
   type: string;
   address: string;
   onEdit?: () => void;
   onDelete?: () => void;
+  onSelect?: () => void;
 }): React.JSX.Element {
+  const Wrapper: any = onSelect ? TouchableOpacity : View;
+
   return (
-    <View style={styles.container}>
+    <Wrapper style={styles.container} onPress={onSelect}>
       <Text style={styles.addressTypeText}>{type}</Text>
       <Text style={styles.addressStyle}>{address}</Text>
       <View style={styles.editContainer}>
@@ -27,7 +31,7 @@ export function AddressCard({
           <Text style={styles.editDeleteText}>Delete</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </Wrapper>
   );
 }
 
