@@ -27,14 +27,13 @@ export const commonAction = (name, params) => {
   );
 };
 
-export const resetToRoutes = routes => {
+export const resetStack = (name, params) =>
   navigationRef.current?.dispatch(
     CommonActions.reset({
-      index: (routes?.length || 1) - 1,
-      routes: routes,
+      index: 0,
+      routes: [{ name: name, params: params }],
     }),
   );
-};
 
 export const serializeDate = (date: any): string | null => {
   if (!date) return null;

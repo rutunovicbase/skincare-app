@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Camera,
+  CameraPosition,
   useCameraDevice,
   useCameraPermission,
 } from 'react-native-vision-camera';
@@ -20,11 +21,18 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import { colors } from '../Constant/Colors';
 import { fonts } from '../Constant/Fonts';
 import { icons } from '../Constant/Icons';
-import { hp, wp, fontSize, goBack, navigate } from '../Helpers/globalFunction';
+import {
+  hp,
+  wp,
+  fontSize,
+  goBack,
+  resetStack,
+} from '../Helpers/globalFunction';
 import RNFS from 'react-native-fs';
 import LinearButton from '../Components/common/LinearButton';
 import { OPEN_AI_KEY } from '@env';
 import firestore from '@react-native-firebase/firestore';
+import storage from '@react-native-firebase/storage';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import moment from 'moment';
@@ -43,7 +51,7 @@ function Scan() {
     SkinAnalysisResult[] | 'healthy' | null
   >(null);
   const [cameraActive, setCameraActive] = useState(true);
-  const [activeCamera, setActiveCamera] = useState<string>('front');
+  const [activeCamera, setActiveCamera] = useState<CameraPosition>('front');
   const cameraRef = useRef<Camera>(null);
   const device = useCameraDevice(activeCamera);
   const { hasPermission, requestPermission } = useCameraPermission();
@@ -198,38 +206,118 @@ function Scan() {
       });
   };
 
+  const deletePhotoFromStorage = async (photoURL: string) => {
+    try {
+      if (!photoURL) return;
+
+      const storageRef = storage().refFromURL(photoURL);
+
+      await storageRef.delete();
+      console.log('Old photo deleted from storage');
+    } catch (error) {
+      console.error('Error deleting photo from storage: ', error);
+    }
+  };
+
+  const uploadPhotoToStorage = async (
+    uri: string,
+    uid: string,
+  ): Promise<string> => {
+    try {
+      const timestamp = Date.now();
+      const filename = `skin_analysis/${uid}/${timestamp}.jpg`;
+
+      const cleanUri = uri.replace('file://', '');
+      const reference = storage().ref(filename);
+
+      await reference.putFile(cleanUri);
+
+      const downloadURL = await reference.getDownloadURL();
+
+      return downloadURL;
+    } catch (error) {
+      console.error('Error uploading photo to storage: ', error);
+      throw error;
+    }
+  };
+
   const onPressContinue = async (uid: string) => {
     try {
+      setIsAnalyzing(true);
+
       const aiConsultationRef = firestore().collection('aiConsultation');
-
-      const reviewId = firestore().collection('_').doc().id;
-
-      const newReview = {
-        id: reviewId,
-        aiConsultation: analysisResult,
-        createdAt: moment().toISOString(),
-      };
 
       const querySnapshot = await aiConsultationRef
         .where('userId', '==', uid)
         .get();
 
+      let oldPhotoURL = '';
+      let existingReviewId = '';
+
+      if (!querySnapshot.empty) {
+        const docData = querySnapshot.docs[0].data();
+        const reviews = docData.review || [];
+
+        const existingReview = reviews.find(
+          (r: any) => r.status === 'pending' || r.status === 'rejected',
+        );
+
+        if (existingReview) {
+          oldPhotoURL = existingReview.photoURL || '';
+          existingReviewId = existingReview.id;
+        }
+      }
+
+      if (oldPhotoURL) {
+        await deletePhotoFromStorage(oldPhotoURL);
+      }
+
+      let photoURL = '';
+      if (photoUri) {
+        photoURL = await uploadPhotoToStorage(photoUri, uid);
+      }
+
+      const reviewId = existingReviewId || firestore().collection('_').doc().id;
+
+      const newReview = {
+        id: reviewId,
+        aiConsultation: analysisResult,
+        photoURL: photoURL,
+        status: 'Pending',
+        createdAt: moment().toISOString(),
+      };
+
       if (!querySnapshot.empty) {
         const docRef = querySnapshot.docs[0].ref;
+        const docData = querySnapshot.docs[0].data();
+        let reviews = docData.review || [];
+
+        if (existingReviewId) {
+          reviews = reviews.filter((r: any) => r.id !== existingReviewId);
+        }
+
+        reviews.push(newReview);
+
         await docRef.update({
-          review: firestore.FieldValue.arrayUnion(newReview),
+          review: reviews,
         });
       } else {
         await aiConsultationRef.add({
           userId: uid,
           review: [newReview],
           createdAt: moment().toISOString(),
+          firstName: userInfo?.firstName || '',
+          lastName: userInfo?.lastName || '',
+          profilePhotoURL: userInfo?.profilePhotoURL,
         });
       }
 
-      navigate('LiveReview');
+      setIsAnalyzing(false);
+      resetStack('Home');
     } catch (error) {
       console.error('Error saving aiConsultation: ', error);
+      setIsAnalyzing(false);
+      Alert.alert('Error', 'Failed to save consultation. Please try again.');
     }
   };
 
@@ -415,7 +503,7 @@ function Scan() {
                     onPress={retakePhoto}
                   />
                   <LinearButton
-                    title="Take consult"
+                    title="Continue"
                     style={styles.consultButton}
                     textStyle={styles.continueButtonText}
                     onPress={() => {
