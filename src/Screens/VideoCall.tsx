@@ -8,6 +8,8 @@ import {
   ActivityIndicator,
   StatusBar,
   Image,
+  NativeModules,
+  DeviceEventEmitter,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -18,6 +20,8 @@ import {
   IRtcEngine,
   RtcSurfaceView,
   VideoSourceType,
+  RenderModeType,
+  VideoMirrorModeType,
 } from 'react-native-agora';
 import { colors } from '../Constant/Colors';
 import { fonts } from '../Constant/Fonts';
@@ -25,6 +29,8 @@ import { fontSize, hp, wp, goBack } from '../Helpers/globalFunction';
 import { AGORA_CONFIG, CallState, UserRole } from '../Constant/AgoraConfig';
 import firestore from '@react-native-firebase/firestore';
 import { icons } from '../Constant/Icons';
+
+const { PipModule } = NativeModules;
 
 interface VideoCallProps {
   route?: {
@@ -43,6 +49,7 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
   const [remoteUsers, setRemoteUsers] = useState<number[]>([]);
   const [localUid, setLocalUid] = useState<number>(0);
+  const [isInPipMode, setIsInPipMode] = useState(false);
 
   const engineRef = useRef<IRtcEngine | null>(null);
   const userRole = route?.params?.userRole || UserRole.CLIENT;
@@ -53,8 +60,25 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
     : null;
 
   useEffect(() => {
+    // Enable PiP when entering video call
+    if (PipModule) {
+      PipModule.enablePip();
+    }
+
     initializeAgora();
+
+    // Listen to native PiP mode change events
+    const pipSubscription = DeviceEventEmitter.addListener(
+      'onPipModeChanged',
+      (isPip: boolean) => setIsInPipMode(!!isPip),
+    );
+
     return () => {
+      // Disable PiP when leaving video call
+      if (PipModule) {
+        PipModule.disablePip();
+      }
+      pipSubscription?.remove();
       cleanup();
     };
   }, []);
@@ -82,6 +106,14 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
       engine.enableAudio();
       engine.startPreview(VideoSourceType.VideoSourceCameraPrimary);
 
+      // Ensure local view uses crop-to-fill as well
+      try {
+        engine.setLocalRenderMode(
+          RenderModeType.RenderModeHidden,
+          VideoMirrorModeType.VideoMirrorModeAuto,
+        );
+      } catch {}
+
       const role =
         userRole === UserRole.ADMIN
           ? ClientRoleType.ClientRoleBroadcaster
@@ -107,6 +139,14 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
       },
       onUserJoined: (connection, remoteUid) => {
         setRemoteUsers(prev => [...prev, remoteUid]);
+        // Ensure remote video fills its container (crop instead of letterbox)
+        try {
+          engine.setRemoteRenderMode(
+            remoteUid,
+            RenderModeType.RenderModeHidden,
+            VideoMirrorModeType.VideoMirrorModeAuto,
+          );
+        } catch {}
       },
       onUserOffline: (connection, remoteUid) => {
         setRemoteUsers(prev => prev.filter(id => id !== remoteUid));
@@ -194,6 +234,10 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
   };
 
   const handleEndCall = () => {
+    // Disable PiP when ending call
+    if (PipModule) {
+      PipModule.disablePip();
+    }
     leaveChannel();
     goBack();
   };
@@ -211,25 +255,42 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
       case CallState.CONNECTED:
         const remoteUid = remoteUsers.find(uid => uid !== localUid);
         return (
-          <View style={styles.callContainer}>
-            <View style={styles.videoContainer}>
+          <View
+            style={[styles.callContainer, isInPipMode && styles.pipContainer]}
+          >
+            <View
+              style={[
+                styles.videoContainer,
+                isInPipMode && styles.pipVideoContainer,
+              ]}
+            >
               {remoteUid ? (
-                <View style={styles.remoteVideoWrapper}>
+                <View
+                  style={[
+                    styles.remoteVideoWrapper,
+                    isInPipMode && styles.pipRemoteWrapper,
+                  ]}
+                >
                   <RtcSurfaceView
                     key={remoteUid}
                     canvas={{ uid: remoteUid }}
-                    style={styles.fullScreenVideoView}
+                    style={[
+                      styles.fullScreenVideoView,
+                      isInPipMode && styles.pipVideoView,
+                    ]}
                   />
                 </View>
               ) : (
                 <View style={styles.fullScreenPlaceholder}>
-                  <Text style={{ color: colors.text }}>
-                    Waiting for remote user...
-                  </Text>
+                  {!isInPipMode && (
+                    <Text style={{ color: colors.text }}>
+                      Waiting for remote user...
+                    </Text>
+                  )}
                 </View>
               )}
 
-              {localUid !== 0 && (
+              {localUid !== 0 && !isInPipMode && (
                 <View style={styles.localFloatingVideoWrapper}>
                   <RtcSurfaceView
                     canvas={{ uid: 0 }}
@@ -240,38 +301,40 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
               )}
             </View>
 
-            <View style={styles.controlsContainer}>
-              <TouchableOpacity
-                style={[styles.controlButton]}
-                onPress={toggleMute}
-              >
-                <Image
-                  source={isMuted ? icons.mute : icons.unmute}
-                  style={styles.iconsStyle}
-                />
-              </TouchableOpacity>
+            {!isInPipMode && (
+              <View style={styles.controlsContainer}>
+                <TouchableOpacity
+                  style={[styles.controlButton]}
+                  onPress={toggleMute}
+                >
+                  <Image
+                    source={isMuted ? icons.mute : icons.unmute}
+                    style={styles.iconsStyle}
+                  />
+                </TouchableOpacity>
 
-              <TouchableOpacity
-                style={[styles.controlButton]}
-                onPress={toggleVideo}
-              >
-                <Image
-                  source={
-                    isVideoEnabled
-                      ? icons.videoCameraDisabled
-                      : icons.videoCamera
-                  }
-                  style={styles.iconsStyle}
-                />
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.controlButton]}
+                  onPress={toggleVideo}
+                >
+                  <Image
+                    source={
+                      isVideoEnabled
+                        ? icons.videoCameraDisabled
+                        : icons.videoCamera
+                    }
+                    style={styles.iconsStyle}
+                  />
+                </TouchableOpacity>
 
-              <TouchableOpacity
-                style={[styles.controlButton, styles.endCallButton]}
-                onPress={handleEndCall}
-              >
-                <Image source={icons.call} style={styles.iconsStyle} />
-              </TouchableOpacity>
-            </View>
+                <TouchableOpacity
+                  style={[styles.controlButton, styles.endCallButton]}
+                  onPress={handleEndCall}
+                >
+                  <Image source={icons.call} style={styles.iconsStyle} />
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         );
 
@@ -293,25 +356,65 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
     }
   };
 
+  const ContainerComponent = isInPipMode ? View : SafeAreaView;
+
   return (
-    <SafeAreaView style={styles.container}>
+    <ContainerComponent style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor={colors.black} />
 
-      <View style={styles.header}>
-        <TouchableOpacity onPress={goBack}>
-          <Image source={icons.back} style={styles.backIcon} />
-        </TouchableOpacity>
-        <View style={styles.headerSpacer} />
-      </View>
+      {!isInPipMode && (
+        <View style={styles.header}>
+          <TouchableOpacity onPress={goBack}>
+            <Image source={icons.back} style={styles.backIcon} />
+          </TouchableOpacity>
+          <View style={styles.headerSpacer} />
+        </View>
+      )}
 
       {renderCallContent()}
-    </SafeAreaView>
+    </ContainerComponent>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  pipContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+  },
+  pipVideoContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+  },
+  pipRemoteWrapper: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+  },
+  pipVideoView: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: wp(29.33),
+    height: hp(27.09),
   },
   header: {
     flexDirection: 'row',
@@ -352,7 +455,6 @@ const styles = StyleSheet.create({
   },
   fullScreenVideoView: {
     flex: 1,
-    backgroundColor: colors.black,
   },
   remoteVideoWrapper: {
     flex: 1,

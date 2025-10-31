@@ -302,13 +302,20 @@ function Scan() {
           review: reviews,
         });
       } else {
+        const contactInfo = userInfo?.phoneNumber
+          ? { phoneNumber: userInfo.phoneNumber }
+          : userInfo?.email
+          ? { email: userInfo.email }
+          : {};
+
         await aiConsultationRef.add({
           userId: uid,
           review: [newReview],
           createdAt: moment().toISOString(),
           firstName: userInfo?.firstName || '',
           lastName: userInfo?.lastName || '',
-          profilePhotoURL: userInfo?.profilePhotoURL,
+          profilePhotoURL: userInfo?.profilePhotoURL || '',
+          ...contactInfo,
         });
       }
 
