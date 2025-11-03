@@ -108,6 +108,12 @@ android {
     }
 }
 
+// Workaround: avoid failing on externalNativeBuildClean* when CMake autolinking references
+// codegen folders that don't exist yet. This disables only the Clean tasks for C++.
+tasks.matching { it.name.startsWith("externalNativeBuildClean") }.configureEach {
+    enabled = false
+}
+
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")

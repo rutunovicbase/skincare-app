@@ -60,21 +60,18 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
     : null;
 
   useEffect(() => {
-    // Enable PiP when entering video call
     if (PipModule) {
       PipModule.enablePip();
     }
 
     initializeAgora();
 
-    // Listen to native PiP mode change events
     const pipSubscription = DeviceEventEmitter.addListener(
       'onPipModeChanged',
       (isPip: boolean) => setIsInPipMode(!!isPip),
     );
 
     return () => {
-      // Disable PiP when leaving video call
       if (PipModule) {
         PipModule.disablePip();
       }
@@ -106,7 +103,6 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
       engine.enableAudio();
       engine.startPreview(VideoSourceType.VideoSourceCameraPrimary);
 
-      // Ensure local view uses crop-to-fill as well
       try {
         engine.setLocalRenderMode(
           RenderModeType.RenderModeHidden,
@@ -150,8 +146,6 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
       },
       onUserOffline: (connection, remoteUid) => {
         setRemoteUsers(prev => prev.filter(id => id !== remoteUid));
-        leaveChannel();
-        goBack();
       },
       onError: () => {
         setCallState(CallState.DISCONNECTED);

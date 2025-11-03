@@ -213,7 +213,6 @@ function Scan() {
       const storageRef = storage().refFromURL(photoURL);
 
       await storageRef.delete();
-      console.log('Old photo deleted from storage');
     } catch (error) {
       console.error('Error deleting photo from storage: ', error);
     }

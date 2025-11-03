@@ -51,6 +51,12 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>voip</string>
+		<string>audio</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AlbertSans-Black.ttf</string>
@@ -71,6 +77,17 @@
 		<string>AlbertSans-SemiBoldItalic.ttf</string>
 		<string>AlbertSans-Thin.ttf</string>
 		<string>AlbertSans-ThinItalic.ttf</string>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>skincare</string>
+			</array>
+			<key>CFBundleURLName</key>
+			<string>app</string>
+		</dict>
 	</array>
 </dict>
 </plist>

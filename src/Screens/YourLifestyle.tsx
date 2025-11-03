@@ -28,7 +28,7 @@ export default function YourLifestyle({ onContinue }: Props) {
   );
   const [list, setList] = useState(defaultLifestyle);
 
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const handleOnContinue = async () => {
     if (selectedId) {

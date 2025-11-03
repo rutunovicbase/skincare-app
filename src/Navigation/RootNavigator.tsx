@@ -1,7 +1,5 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { navigationRef } from '../Helpers/globalFunction';
 import Login from '../Screens/Login';
 import OTPVerification from '../Screens/OTPVarification';
 import SelectLanguage from '../Screens/SelectLanguage';
@@ -152,52 +150,50 @@ function RootNavigator(): React.JSX.Element {
   const Stack = createNativeStackNavigator();
 
   return (
-    <NavigationContainer ref={navigationRef}>
-      <Stack.Navigator
-        screenOptions={{ headerShown: false }}
-        initialRouteName={'Splash' as any}
-      >
-        <Stack.Screen name="Splash" component={Splash} />
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="OTPVerification" component={OTPVerification} />
-        <Stack.Screen name="SelectLanguage" component={SelectLanguage} />
-        <Stack.Screen name="Onboarding" component={Onboarding} />
-        <Stack.Screen name="OnboardingFlow" component={OnboardingFlow} />
-        <Stack.Screen name="AddPhoto" component={AddPhoto} />
-        <Stack.Screen
-          name="MainTabs"
-          component={TabNavigator}
-          options={{ animation: 'none' }}
-        />
-        <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Subscription" component={Subscription} />
-        <Stack.Screen name="ProfileDetails" component={ProfileDetails} />
-        <Stack.Screen name="LifestyleInsights" component={LifestyleInsights} />
-        <Stack.Screen name="YourLifestyle" component={YourLifestyle} />
-        <Stack.Screen
-          name="DietaryPreferences"
-          component={DietaryPreferences}
-        />
-        <Stack.Screen name="YourStressLevel" component={YourStressLevel} />
-        <Stack.Screen name="GeneralSettings" component={GeneralSettings} />
-        <Stack.Screen name="ConsultReport" component={ConsultReport} />
-        <Stack.Screen name="Details" component={Details} />
-        <Stack.Screen name="DiseaseDetails" component={DiseaseDetails} />
-        <Stack.Screen
-          name="ManageSubscription"
-          component={ManageSubscription}
-        />
-        <Stack.Screen name="OrderDetails" component={OrderDetails} />
-        <Stack.Screen name="OrderReview" component={OrderReview} />
-        <Stack.Screen name="Address" component={Address} />
-        <Stack.Screen name="AddAddress" component={AddAddress} />
-        <Stack.Screen name="OrderPreview" component={OrderPreview} />
-        <Stack.Screen name="CancelOrder" component={CancelOrder} />
-        <Stack.Screen name="Success" component={Success} />
-        <Stack.Screen name="LiveReview" component={LiveReview} />
-        <Stack.Screen name="VideoCall" component={VideoCall} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Stack.Navigator
+      screenOptions={{ headerShown: false }}
+      initialRouteName={'Splash' as any}
+    >
+      <Stack.Screen name="Splash" component={Splash} />
+      <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="OTPVerification" component={OTPVerification} />
+      <Stack.Screen name="SelectLanguage" component={SelectLanguage} />
+      <Stack.Screen name="Onboarding" component={Onboarding} />
+      <Stack.Screen name="OnboardingFlow" component={OnboardingFlow} />
+      <Stack.Screen name="AddPhoto" component={AddPhoto} />
+      <Stack.Screen
+        name="MainTabs"
+        component={TabNavigator}
+        options={{ animation: 'none' }}
+      />
+      <Stack.Screen name="Home" component={Home} />
+      <Stack.Screen name="Subscription" component={Subscription} />
+      <Stack.Screen name="ProfileDetails" component={ProfileDetails} />
+      <Stack.Screen name="LifestyleInsights" component={LifestyleInsights} />
+      <Stack.Screen name="YourLifestyle" component={YourLifestyle} />
+      <Stack.Screen
+        name="DietaryPreferences"
+        component={DietaryPreferences}
+      />
+      <Stack.Screen name="YourStressLevel" component={YourStressLevel} />
+      <Stack.Screen name="GeneralSettings" component={GeneralSettings} />
+      <Stack.Screen name="ConsultReport" component={ConsultReport} />
+      <Stack.Screen name="Details" component={Details} />
+      <Stack.Screen name="DiseaseDetails" component={DiseaseDetails} />
+      <Stack.Screen
+        name="ManageSubscription"
+        component={ManageSubscription}
+      />
+      <Stack.Screen name="OrderDetails" component={OrderDetails} />
+      <Stack.Screen name="OrderReview" component={OrderReview} />
+      <Stack.Screen name="Address" component={Address} />
+      <Stack.Screen name="AddAddress" component={AddAddress} />
+      <Stack.Screen name="OrderPreview" component={OrderPreview} />
+      <Stack.Screen name="CancelOrder" component={CancelOrder} />
+      <Stack.Screen name="Success" component={Success} />
+      <Stack.Screen name="LiveReview" component={LiveReview} />
+      <Stack.Screen name="VideoCall" component={VideoCall} />
+    </Stack.Navigator>
   );
 }
 

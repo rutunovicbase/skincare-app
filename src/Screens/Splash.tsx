@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, Linking } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { parseVideoCallFromUrl } from '../utils/deepLinking';
 import auth from '@react-native-firebase/auth';
 import { colors } from '../Constant/Colors';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,6 +17,17 @@ export default function Splash(): React.JSX.Element {
 
   useEffect(() => {
     const init = async () => {
+      try {
+        const initialUrl = await Linking.getInitialURL();
+        if (initialUrl && parseVideoCallFromUrl(initialUrl)) {
+          return;
+        }
+        const pendingUrl = await AsyncStorage.getItem('PENDING_CALL_URL');
+        if (pendingUrl && parseVideoCallFromUrl(pendingUrl)) {
+          return;
+        }
+      } catch {}
+
       const currentUser = auth().currentUser;
       if (!currentUser) {
         navigation.reset({ index: 0, routes: [{ name: 'Login' }] });

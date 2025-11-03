@@ -15,8 +15,6 @@ import { fontSize, hp, navigate, wp } from '../Helpers/globalFunction';
 import { fonts } from '../Constant/Fonts';
 import { icons } from '../Constant/Icons';
 import { FlatList } from 'react-native-gesture-handler';
-import { useSelector } from 'react-redux';
-import { RootState } from '../store/store';
 
 const data = [
   {
@@ -300,6 +298,7 @@ const styles = StyleSheet.create({
   subBannerText: {
     fontSize: fontSize(16),
     fontFamily: fonts.Semibold,
+    color: colors.text,
   },
   homeBanner1Container: {
     height: hp(18.47),
@@ -380,6 +379,7 @@ const styles = StyleSheet.create({
     fontSize: fontSize(32),
     width: wp(48.8),
     fontFamily: fonts.Bold,
+    color: colors.text,
   },
   banner2TextBold: {
     fontSize: fontSize(32),
@@ -410,6 +410,7 @@ const styles = StyleSheet.create({
     fontSize: fontSize(16),
     fontFamily: fonts.Medium,
     width: wp(51.46),
+    color: colors.text,
   },
   visitNowButton: {
     justifyContent: 'center',
@@ -422,10 +423,12 @@ const styles = StyleSheet.create({
   scanNowText: {
     fontSize: fontSize(16),
     fontFamily: fonts.Medium,
+    color: colors.text,
   },
   visitNowText: {
     fontSize: fontSize(16),
     fontFamily: fonts.Semibold,
+    color: colors.text,
   },
   blurViewBanner3Container: {
     width: '100%',
@@ -559,6 +562,7 @@ const styles = StyleSheet.create({
   reviewNameText: {
     fontFamily: fonts.Medium,
     fontSize: fontSize(12),
+    color: colors.text,
   },
   reviewRatingContainer: {
     marginTop: hp(1.23),
@@ -575,6 +579,7 @@ const styles = StyleSheet.create({
     fontSize: fontSize(12),
     fontFamily: fonts.Medium,
     marginBottom: hp(1.23),
+    color: colors.text,
   },
   contentContainerStyle: {
     paddingVertical: hp(3.07),

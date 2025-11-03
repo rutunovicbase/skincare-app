@@ -47,33 +47,61 @@ const agoraTokenGenerator = functions.https.onRequest(async (req, res) => {
 const sendPushNotification = functions.https.onRequest(async (req, res) => {
   cors(req, res, async () => {
     try {
-      const { title, body, type, fcmToken, data } = req.body;
-      if (!title || !body || !type || !fcmToken) {
+      const { title, body, type, fcmToken, data, notification } = req.body;
+
+      if (!fcmToken) {
         return res.status(400).json({
           success: false,
-          message: 'Missing required fields',
+          message: 'Missing FCM token',
         });
       }
+
       const message = {
         token: fcmToken,
-        notification: { title, body },
-        data: data ? data : {},
+        notification: notification || {
+          title: title || 'Notification',
+          body: body || '',
+        },
+        data: {
+          ...(data?.sessionId && { sessionId: String(data.sessionId) }),
+          ...(data?.channelName && { channelName: String(data.channelName) }),
+          ...(data?.rtcToken && { rtcToken: String(data.rtcToken) }),
+          ...(type && { type: String(type) }),
+        },
+        android: {
+          priority: 'high',
+          notification: {
+            channelId: 'video_call_channel',
+            priority: 'high',
+            sound: 'default',
+          },
+        },
+        apns: {
+          payload: {
+            aps: {
+              sound: 'default',
+              contentAvailable: true,
+            },
+          },
+        },
       };
 
-      await admin.messaging().send(message);
+      const response = await admin.messaging().send(message);
+
       return res.status(200).json({
         success: true,
         message: 'Push sent successfully',
+        messageId: response,
       });
     } catch (error) {
+      console.error('Error sending push notification:', error);
       return res.status(500).json({
         success: false,
         message: 'Something went wrong',
+        error: error.message,
       });
     }
   });
 });
 
 module.exports = { agoraTokenGenerator, sendPushNotification };
-
-// https://us-central1-skincare-5f908.cloudfunctions.net/agoraTokenGenerator
