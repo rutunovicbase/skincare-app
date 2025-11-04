@@ -1,9 +1,11 @@
 import { Platform, Linking } from 'react-native';
 import { buildVideoCallUrl } from '../utils/deepLinking';
 import RNCallKeep from 'react-native-callkeep';
-import { UserRole } from '../Constant/AgoraConfig';
+import { CallState, UserRole } from '../Constant/AgoraConfig';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { store } from '../store/store';
+import moment from 'moment';
 
 const callKeepOptions = {
   ios: {
@@ -67,41 +69,51 @@ class CallKeepService {
     RNCallKeep.addEventListener('didDisplayIncomingCall', () => {});
 
     RNCallKeep.addEventListener('answerCall', async ({ callUUID }) => {
-      let callData = this.pendingCalls.get(callUUID);
-      if (!callData) {
-        const sessionDoc = await firestore()
-          .collection('videoCallSessions')
-          .doc(callUUID)
-          .get();
-        if (sessionDoc.exists()) {
-          const data = sessionDoc.data();
-          callData = {
-            sessionId: callUUID,
-            channelName: data?.channelName || '',
-            rtcToken: data?.patientToken || '',
-          };
+      try {
+        let callData = this.pendingCalls.get(callUUID);
+
+        if (!callData) {
+          const sessionDoc = await firestore()
+            .collection('videoCallSessions')
+            .doc(callUUID)
+            .get();
+
+          if (sessionDoc.exists()) {
+            const data = sessionDoc.data();
+            callData = {
+              sessionId: callUUID,
+              channelName: data?.channelName || '',
+              rtcToken: data?.patientToken || '',
+            };
+          }
         }
-      }
-      if (callData) {
-        if (Platform.OS === 'android') RNCallKeep.backToForeground();
-        const url = buildVideoCallUrl({
-          userRole: UserRole.CLIENT,
-          channelName: callData.channelName,
-          rtcToken: callData.rtcToken,
-          sessionId: callData.sessionId,
-        });
-        console.log('Opening call deep link:', url);
-        try {
+
+        if (callData) {
+          RNCallKeep.setCurrentCallActive(callUUID);
+
+          if (Platform.OS === 'android') RNCallKeep.backToForeground();
+
+          const url = buildVideoCallUrl({
+            userRole: UserRole.CLIENT,
+            channelName: callData.channelName,
+            rtcToken: callData.rtcToken,
+            sessionId: callData.sessionId,
+          });
+
           await AsyncStorage.setItem('PENDING_CALL_URL', url);
           await new Promise(r => setTimeout(r, 200));
           await Linking.openURL(url);
-        } catch {}
-        this.pendingCalls.delete(callUUID);
-        this.answeredCalls.add(callUUID);
-        setTimeout(() => {
-          RNCallKeep.endCall(callUUID);
-          setTimeout(() => this.answeredCalls.delete(callUUID), 2000);
-        }, 3000);
+
+          this.pendingCalls.delete(callUUID);
+          this.answeredCalls.add(callUUID);
+
+          setTimeout(() => {
+            RNCallKeep.endCall(callUUID);
+            setTimeout(() => this.answeredCalls.delete(callUUID), 2000);
+          }, 2000);
+        }
+      } catch (err) {
+        console.error('Error answering call:', err);
       }
     });
 
@@ -118,11 +130,19 @@ class CallKeepService {
   }
 
   private async logCallRejection(callUUID: string) {
+    console.log(
+      '🚀 ~ CallKeepService ~ logCallRejection ~ callUUID:',
+      callUUID,
+    );
     try {
-      await firestore().collection('videoCallSessions').doc(callUUID).update({
-        status: 'REJECTED',
-        rejectedAt: firestore.FieldValue.serverTimestamp(),
-      });
+      await firestore()
+        .collection('videoCallSessions')
+        .doc(callUUID)
+        .update({
+          status: CallState.DISCONNECTED,
+          rejectedBy: store?.getState()?.auth?.user?.uid || null,
+          rejectedAt: moment().toISOString(),
+        });
       RNCallKeep.endCall(callUUID);
     } catch {}
   }

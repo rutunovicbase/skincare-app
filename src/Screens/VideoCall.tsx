@@ -10,6 +10,8 @@ import {
   Image,
   NativeModules,
   DeviceEventEmitter,
+  BackHandler,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -25,7 +27,13 @@ import {
 } from 'react-native-agora';
 import { colors } from '../Constant/Colors';
 import { fonts } from '../Constant/Fonts';
-import { fontSize, hp, wp, goBack } from '../Helpers/globalFunction';
+import {
+  fontSize,
+  hp,
+  wp,
+  goBack,
+  navigationRef,
+} from '../Helpers/globalFunction';
 import { AGORA_CONFIG, CallState, UserRole } from '../Constant/AgoraConfig';
 import firestore from '@react-native-firebase/firestore';
 import { icons } from '../Constant/Icons';
@@ -135,7 +143,6 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
       },
       onUserJoined: (connection, remoteUid) => {
         setRemoteUsers(prev => [...prev, remoteUid]);
-        // Ensure remote video fills its container (crop instead of letterbox)
         try {
           engine.setRemoteRenderMode(
             remoteUid,
@@ -146,6 +153,7 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
       },
       onUserOffline: (connection, remoteUid) => {
         setRemoteUsers(prev => prev.filter(id => id !== remoteUid));
+        handleEndCall();
       },
       onError: () => {
         setCallState(CallState.DISCONNECTED);
@@ -228,13 +236,50 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
   };
 
   const handleEndCall = () => {
-    // Disable PiP when ending call
     if (PipModule) {
       PipModule.disablePip();
     }
     leaveChannel();
-    goBack();
+    const state = navigationRef?.current?.getState();
+
+    const routes = state.routes;
+    const currentRoute = routes[routes.length - 1];
+    const previousRoute = routes[routes.length - 2];
+    if (
+      state?.routes?.length === 2 &&
+      currentRoute?.name === 'VideoCall' &&
+      previousRoute?.name === 'Splash'
+    ) {
+      if (Platform.OS === 'android') {
+        NativeModules.AppTermination.exitApp();
+      } else {
+        BackHandler.exitApp();
+      }
+    } else {
+      goBack();
+    }
   };
+
+  useEffect(() => {
+    let unsubscribe: (() => void) | null = null;
+    if (sessionDocRef) {
+      unsubscribe = sessionDocRef.onSnapshot(doc => {
+        try {
+          const data = doc.data();
+          const status = data?.status;
+          if (status === CallState.DISCONNECTED) {
+            handleEndCall();
+          }
+        } catch (e) {}
+      });
+    }
+
+    return () => {
+      try {
+        unsubscribe && unsubscribe();
+      } catch (e) {}
+    };
+  }, [sessionId]);
 
   const renderCallContent = () => {
     switch (callState) {
