@@ -60,6 +60,11 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
   const [isInPipMode, setIsInPipMode] = useState(false);
 
   const engineRef = useRef<IRtcEngine | null>(null);
+  const callStateRef = useRef<CallState | null>(null);
+  const remoteUsersRef = useRef<number[]>([]);
+  const disconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
   const userRole = route?.params?.userRole || UserRole.CLIENT;
   const { channelName, rtcToken, sessionId } = route?.params || {};
 
@@ -91,6 +96,7 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
   const initializeAgora = async () => {
     try {
       setCallState(CallState.CONNECTING);
+      callStateRef.current = CallState.CONNECTING;
       if (sessionDocRef) {
         await sessionDocRef.update({ status: 'CONNECTING' }).catch(() => {});
       }
@@ -128,6 +134,7 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
     } catch (error) {
       console.error('Failed to initialize Agora:', error);
       setCallState(CallState.ERROR);
+      callStateRef.current = CallState.ERROR;
       Alert.alert(
         'Error',
         'Failed to initialize video call. Please try again.',
@@ -139,10 +146,19 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
     const eventHandlers: IRtcEngineEventHandler = {
       onJoinChannelSuccess: async connection => {
         setCallState(CallState.CONNECTED);
+        callStateRef.current = CallState.CONNECTED;
         setLocalUid(connection?.localUid ?? 0);
       },
       onUserJoined: (connection, remoteUid) => {
-        setRemoteUsers(prev => [...prev, remoteUid]);
+        setRemoteUsers(prev => {
+          const updated = [...prev, remoteUid];
+          remoteUsersRef.current = updated;
+          if (disconnectTimeoutRef.current) {
+            clearTimeout(disconnectTimeoutRef.current);
+            disconnectTimeoutRef.current = null;
+          }
+          return updated;
+        });
         try {
           engine.setRemoteRenderMode(
             remoteUid,
@@ -152,17 +168,40 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
         } catch {}
       },
       onUserOffline: (connection, remoteUid) => {
-        setRemoteUsers(prev => prev.filter(id => id !== remoteUid));
-        handleEndCall();
+        setRemoteUsers(prev => {
+          const updated = prev.filter(id => id !== remoteUid);
+          remoteUsersRef.current = updated;
+          if (
+            updated.length === 0 &&
+            callStateRef.current === CallState.CONNECTED
+          ) {
+            if (disconnectTimeoutRef.current) {
+              clearTimeout(disconnectTimeoutRef.current);
+            }
+            disconnectTimeoutRef.current = setTimeout(() => {
+              if (
+                remoteUsersRef.current.length === 0 &&
+                callStateRef.current === CallState.CONNECTED
+              ) {
+                handleEndCall();
+              }
+              disconnectTimeoutRef.current = null;
+            }, 5000);
+          }
+          return updated;
+        });
       },
       onError: () => {
         setCallState(CallState.DISCONNECTED);
+        callStateRef.current = CallState.DISCONNECTED;
         if (sessionDocRef)
           sessionDocRef.update({ status: 'DISCONNECTED' }).catch(() => {});
       },
       onLeaveChannel: async () => {
         setCallState(CallState.DISCONNECTED);
+        callStateRef.current = CallState.DISCONNECTED;
         setRemoteUsers([]);
+        remoteUsersRef.current = [];
         if (sessionDocRef) {
           await sessionDocRef
             .update({ status: 'DISCONNECTED' })
@@ -184,6 +223,7 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
     } catch (error) {
       console.error('Failed to join channel:', error);
       setCallState(CallState.DISCONNECTED);
+      callStateRef.current = CallState.DISCONNECTED;
     }
   };
 
@@ -193,6 +233,7 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
     try {
       engineRef.current.leaveChannel();
       setCallState(CallState.DISCONNECTED);
+      callStateRef.current = CallState.DISCONNECTED;
       if (sessionDocRef) {
         await sessionDocRef
           .update({ status: CallState.DISCONNECTED })
@@ -224,6 +265,11 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
   };
 
   const cleanup = async () => {
+    if (disconnectTimeoutRef.current) {
+      clearTimeout(disconnectTimeoutRef.current);
+      disconnectTimeoutRef.current = null;
+    }
+
     if (engineRef.current) {
       try {
         engineRef.current.leaveChannel();
@@ -262,13 +308,39 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
 
   useEffect(() => {
     let unsubscribe: (() => void) | null = null;
+    let statusDisconnectTimeout: ReturnType<typeof setTimeout> | null = null;
+
     if (sessionDocRef) {
       unsubscribe = sessionDocRef.onSnapshot(doc => {
         try {
           const data = doc.data();
           const status = data?.status;
           if (status === CallState.DISCONNECTED) {
-            handleEndCall();
+            if (statusDisconnectTimeout) {
+              clearTimeout(statusDisconnectTimeout);
+            }
+
+            if (
+              callStateRef.current === CallState.CONNECTED &&
+              remoteUsersRef.current.length === 0
+            ) {
+              statusDisconnectTimeout = setTimeout(() => {
+                if (
+                  callStateRef.current === CallState.CONNECTED &&
+                  remoteUsersRef.current.length === 0
+                ) {
+                  handleEndCall();
+                }
+                statusDisconnectTimeout = null;
+              }, 3000);
+            } else if (callStateRef.current !== CallState.CONNECTED) {
+              handleEndCall();
+            }
+          } else {
+            if (statusDisconnectTimeout) {
+              clearTimeout(statusDisconnectTimeout);
+              statusDisconnectTimeout = null;
+            }
           }
         } catch (e) {}
       });
@@ -276,6 +348,9 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
 
     return () => {
       try {
+        if (statusDisconnectTimeout) {
+          clearTimeout(statusDisconnectTimeout);
+        }
         unsubscribe && unsubscribe();
       } catch (e) {}
     };

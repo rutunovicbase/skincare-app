@@ -40,9 +40,7 @@ export default function YourLifestyle({ onContinue }: Props) {
             .doc(currentUser.uid)
             .set({ lifestyle: selectedId }, { merge: true });
         }
-      } catch (e) {
-        console.log('Error saving lifestyle:', e);
-      }
+      } catch (e) {}
       if (onContinue) {
         onContinue();
       } else {

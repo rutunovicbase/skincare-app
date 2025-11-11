@@ -130,10 +130,6 @@ class CallKeepService {
   }
 
   private async logCallRejection(callUUID: string) {
-    console.log(
-      '🚀 ~ CallKeepService ~ logCallRejection ~ callUUID:',
-      callUUID,
-    );
     try {
       await firestore()
         .collection('videoCallSessions')
@@ -183,7 +179,7 @@ class CallKeepService {
         const hasAccount = await RNCallKeep.hasPhoneAccount();
         if (!hasAccount) {
           await RNCallKeep.setup(callKeepOptions);
-          await RNCallKeep.setAvailable(true);
+          RNCallKeep.setAvailable(true);
         }
         return true;
       } catch {
