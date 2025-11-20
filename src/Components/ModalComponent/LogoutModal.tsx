@@ -94,6 +94,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: hp(1.84),
     marginBottom: hp(0.61),
+    color: colors.text,
   },
   logoutAccountDesc: {
     fontSize: fontSize(12),

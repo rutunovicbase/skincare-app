@@ -149,6 +149,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.Semibold,
     fontSize: fontSize(16),
     marginBottom: hp(0.61),
+    color: colors.text,
   },
   severityText: {
     color: colors.secondaryPurple,

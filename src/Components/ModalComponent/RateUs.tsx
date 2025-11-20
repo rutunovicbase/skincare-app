@@ -100,6 +100,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: hp(3.44),
     marginBottom: hp(1.23),
+    color: colors.text,
   },
   rateUsDesc: {
     fontSize: fontSize(12),
@@ -107,6 +108,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: hp(1.97),
     marginBottom: hp(2.33),
+    color: colors.text,
   },
   buttonContainer: {
     height: hp(6.15),

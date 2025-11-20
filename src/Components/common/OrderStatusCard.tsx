@@ -50,6 +50,7 @@ const styles = StyleSheet.create({
     fontSize: fontSize(14),
     fontFamily: fonts.Semibold,
     marginBottom: wp(1.06),
+    color: colors.text,
   },
   statusText: {
     fontSize: fontSize(14),

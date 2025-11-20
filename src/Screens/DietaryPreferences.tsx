@@ -127,6 +127,7 @@ const styles = StyleSheet.create({
     fontSize: fontSize(16),
     fontFamily: fonts.Semibold,
     marginBottom: hp(2.46),
+    color: colors.text,
   },
   continueButton: {
     backgroundColor: colors.primary,
@@ -138,6 +139,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: fontSize(16),
     fontFamily: fonts.Semibold,
+    color: colors.text,
   },
   lifestyleItemContainer: {
     height: hp(4.92),
@@ -157,5 +159,6 @@ const styles = StyleSheet.create({
   lifestyleItemText: {
     fontFamily: fonts.Medium,
     fontSize: fontSize(14),
+    color: colors.text,
   },
 });

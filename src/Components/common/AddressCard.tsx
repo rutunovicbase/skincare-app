@@ -46,11 +46,13 @@ const styles = StyleSheet.create({
   addressTypeText: {
     fontSize: fontSize(16),
     fontFamily: fonts.Semibold,
+    color: colors.text,
   },
   addressStyle: {
     fontSize: fontSize(15),
     fontFamily: fonts.Medium,
     marginBottom: hp(1.23),
+    color: colors.text,
   },
   editContainer: {
     flexDirection: 'row',

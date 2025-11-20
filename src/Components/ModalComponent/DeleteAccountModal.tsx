@@ -94,6 +94,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.Semibold,
     textAlign: 'center',
     marginTop: hp(1.84),
+    color: colors.text,
     marginBottom: hp(0.61),
   },
   deleteAccountDesc: {

@@ -121,6 +121,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: fontSize(16),
     fontFamily: fonts.Semibold,
+    color: colors.text,
   },
   orContainer: {
     flexDirection: 'row',
@@ -144,6 +145,7 @@ const styles = StyleSheet.create({
     fontSize: fontSize(18),
     fontFamily: fonts.Semibold,
     marginBottom: hp(1.84),
+    color: colors.text,
   },
   emptyText: {
     fontFamily: fonts.Medium,

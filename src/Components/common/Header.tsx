@@ -3,6 +3,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { fontSize, goBack, hp, wp } from '../../Helpers/globalFunction';
 import { icons } from '../../Constant/Icons';
 import { fonts } from '../../Constant/Fonts';
+import { colors } from '../../Constant/Colors';
 
 export function Header({
   title,
@@ -37,5 +38,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: fontSize(22),
     fontFamily: fonts.Semibold,
+    color: colors.text,
   },
 });

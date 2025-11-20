@@ -63,6 +63,7 @@ const styles = StyleSheet.create({
   fieldName: {
     fontSize: fontSize(14),
     fontFamily: fonts.Medium,
+    color: colors.text,
   },
   discountedPrice: {
     fontSize: fontSize(14),

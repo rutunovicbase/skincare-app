@@ -41,6 +41,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: hp(1.23),
     marginBottom: hp(3.07),
+    color: colors.text,
   },
   mainContainer: {
     flex: 1,

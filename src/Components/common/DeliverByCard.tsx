@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.Semibold,
     fontSize: fontSize(16),
     marginBottom: hp(1.84),
+    color: colors.text,
   },
   dateContainer: {
     paddingVertical: hp(0.61),

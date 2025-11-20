@@ -279,6 +279,7 @@ const styles = StyleSheet.create({
   doctorNameText: {
     fontSize: fontSize(16),
     fontFamily: fonts.Semibold,
+    color: colors.text,
   },
   cardRightView: {
     justifyContent: 'space-between',

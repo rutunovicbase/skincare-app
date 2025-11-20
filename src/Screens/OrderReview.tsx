@@ -145,15 +145,18 @@ const styles = StyleSheet.create({
     fontFamily: fonts.Semibold,
     fontSize: fontSize(16),
     marginBottom: hp(1.84),
+    color: colors.text,
   },
   addressText: {
     fontFamily: fonts.Medium,
     fontSize: fontSize(16),
+    color: colors.text,
   },
   addAddressText: {
     fontSize: fontSize(16),
     fontFamily: fonts.Semibold,
     textAlign: 'center',
+    color: colors.text,
   },
   addAddressButton: {
     backgroundColor: colors.primary,
@@ -168,11 +171,13 @@ const styles = StyleSheet.create({
     fontFamily: fonts.Semibold,
     fontSize: fontSize(22),
     marginBottom: hp(1.84),
+    color: colors.text,
   },
   paymentTitle: {
     fontSize: fontSize(14),
     fontFamily: fonts.Medium,
     marginBottom: hp(1.23),
+    color: colors.text,
   },
   paymentMethodOptionContainer: {
     flexDirection: 'row',
@@ -205,6 +210,7 @@ const styles = StyleSheet.create({
   paymentName: {
     fontSize: fontSize(12),
     fontFamily: fonts.Medium,
+    color: colors.text,
   },
   footerContainer: {
     marginTop: hp(6.15),
@@ -219,5 +225,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: fontSize(16),
     fontFamily: fonts.Semibold,
+    color: colors.text,
   },
 });

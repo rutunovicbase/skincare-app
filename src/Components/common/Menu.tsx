@@ -69,6 +69,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.Semibold,
     fontSize: fontSize(16),
     paddingVertical: hp(1.23),
+    color: colors.text,
   },
   menuIcon: {
     height: wp(4),

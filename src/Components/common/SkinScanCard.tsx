@@ -52,6 +52,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: fontSize(16),
     fontFamily: fonts.Semibold,
+    color: colors.text,
   },
   crossArrowIcon: {
     height: wp(6.66),
