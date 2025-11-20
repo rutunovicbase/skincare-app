@@ -1,4 +1,4 @@
-import { AnyAction } from '@reduxjs/toolkit';
+import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
 import { fetchUserData } from '../store/Slices/authSlice';
 
 type Navigation = {
@@ -6,7 +6,7 @@ type Navigation = {
 };
 
 export async function navigateAfterAuth(
-  dispatch: (action: AnyAction) => Promise<any> | AnyAction,
+  dispatch: ThunkDispatch<any, any, AnyAction>,
   navigation: Navigation,
   userId: string,
   isNewUser: boolean | undefined,

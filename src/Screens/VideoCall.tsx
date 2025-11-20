@@ -151,7 +151,8 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
       },
       onUserJoined: (connection, remoteUid) => {
         setRemoteUsers(prev => {
-          const updated = [...prev, remoteUid];
+          // Only keep the latest remote user
+          const updated = [remoteUid];
           remoteUsersRef.current = updated;
           if (disconnectTimeoutRef.current) {
             clearTimeout(disconnectTimeoutRef.current);
@@ -367,7 +368,8 @@ const VideoCall: React.FC<VideoCallProps> = ({ route }) => {
         );
 
       case CallState.CONNECTED:
-        const remoteUid = remoteUsers.find(uid => uid !== localUid);
+        // Always show the most recently joined remote user
+        const remoteUid = remoteUsers.length > 0 ? remoteUsers[remoteUsers.length - 1] : null;
         return (
           <View
             style={[styles.callContainer, isInPipMode && styles.pipContainer]}
