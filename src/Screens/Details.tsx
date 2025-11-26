@@ -22,9 +22,6 @@ type Props = {
 
 export default function Details({ route }: Props): React.JSX.Element {
   const { item: scanItem } = route.params;
-  // const onPressDisease = (disease: string) => {
-  //   navigate('DiseaseDetails', { item: disease });
-  // };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -41,13 +38,6 @@ export default function Details({ route }: Props): React.JSX.Element {
         <View style={styles.problemsContainer}>
           {(scanItem?.aiConsultation ?? []).map((ai: AIConsultation) => {
             return (
-              // <TouchableOpacity
-              //   key={idx}
-              //   style={styles.problemContainer}
-              //   onPress={() => {
-              //     onPressDisease(ai?.problem);
-              //   }}
-              // >
               <View style={styles.problemContainer}>
                 <View style={styles.problemTextContainer}>
                   <Text
@@ -70,7 +60,6 @@ export default function Details({ route }: Props): React.JSX.Element {
                   style={styles.crossArrowStyle}
                 />
               </View>
-              // </TouchableOpacity>
             );
           })}
         </View>
